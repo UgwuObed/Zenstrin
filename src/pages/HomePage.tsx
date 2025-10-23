@@ -250,7 +250,7 @@ function HomePage() {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/privacy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
+                <li><a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
                 <li><a href="#" className="hover:text-[#f7961c] transition-colors">Terms</a></li>
                 <li><a href="#" className="hover:text-[#f7961c] transition-colors">Security</a></li>
               </ul>

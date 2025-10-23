@@ -468,7 +468,7 @@ function PrivacyPage() {
                 <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
                 <ul className="space-y-2 text-gray-600 text-sm">
                   <li>
-                    <a href="/privacy" className="hover:text-[#f7961c] transition-colors">
+                    <a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">
                       Privacy
                     </a>
                   </li>
