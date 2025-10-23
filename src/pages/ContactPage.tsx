@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Menu, X, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Menu, X, Mail, Phone, MapPin, Send } from 'lucide-react';
 
 function ContactPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,40 +49,44 @@ function ContactPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-white/95 backdrop-blur-sm border-b border-gray-200' : 'bg-white border-b border-gray-200'}`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-7 h-7 text-orange-500" />
-              <span className="text-2xl font-semibold text-gray-900">Zenstrin</span>
-            </div>
+  <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-white/95 backdrop-blur-sm border-b border-gray-200' : 'bg-white border-b border-gray-200'}`}>
+  <div className="max-w-7xl mx-auto px-6 py-4">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-2">
+        <img 
+          src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+          alt="Zenstrin Logo" 
+          className="h-16 w-auto" 
+        />
+      </div>
 
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Home</a>
-              <a href="/blog" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Blog</a>
-              <a href="/contact" className="text-orange-500 font-medium">Contact Us</a>
-              <button className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full">
-                Get Started
-              </button>
-            </div>
+      <div className="hidden md:flex items-center space-x-8">
+        <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Home</a>
+        <a href="/blog" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Blog</a>
+        <a href="/contact" className="text-[#f7961c] font-medium">Contact Us</a>
+        <button className="px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+          Get Started
+        </button>
+      </div>
 
-            <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+      <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+    </div>
 
-          {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 space-y-4">
-              <a href="/" className="block text-gray-700 hover:text-orange-500 transition-colors">Home</a>
-              <a href="/blog" className="block text-gray-700 hover:text-orange-500 transition-colors">Blog</a>
-              <a href="/contact" className="block text-orange-500">Contact Us</a>
-              <button className="w-full px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full">
-                Get Started
-              </button>
-            </div>
-          )}
-        </div>
-      </nav>
+    {isMenuOpen && (
+      <div className="md:hidden mt-4 pb-4 space-y-4">
+        <a href="/" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Home</a>
+        <a href="/blog" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Blog</a>
+        <a href="/contact" className="block text-[#f7961c]">Contact Us</a>
+        <button className="w-full px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+          Get Started
+        </button>
+      </div>
+    )}
+  </div>
+</nav>
+
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-gray-50 to-white">
@@ -141,7 +145,7 @@ function ContactPage() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="John"
                     />
                   </div>
@@ -152,7 +156,7 @@ function ContactPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="Doe"
                     />
                   </div>
@@ -166,7 +170,7 @@ function ContactPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -177,7 +181,7 @@ function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="+1 (555) 123-4567"
                     />
                   </div>
@@ -190,7 +194,7 @@ function ContactPage() {
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                     placeholder="Your Company"
                   />
                 </div>
@@ -201,7 +205,7 @@ function ContactPage() {
                     name="interest"
                     value={formData.interest}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors bg-white"
                   >
                     <option value="Zenstrin">Zenstrin - Property Management</option>
                     <option value="ZenFinder">ZenFinder - Voice Marketplace</option>
@@ -218,14 +222,14 @@ function ContactPage() {
                     value={formData.message}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors resize-none"
                     placeholder="Tell us about your needs..."
                   />
                 </div>
 
                 <button
                   onClick={handleSubmit}
-                  className="w-full md:w-auto px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full flex items-center justify-center space-x-2"
+                  className="w-full md:w-auto px-8 py-3 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full flex items-center justify-center space-x-2"
                 >
                   <span>Send Message</span>
                   <Send className="w-4 h-4" />
@@ -276,34 +280,37 @@ function ContactPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Sparkles className="w-6 h-6 text-orange-500" />
-                <span className="text-xl font-semibold text-gray-900">Zenstrin</span>
+              <div className="mb-4">
+                <img 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                  alt="Zenstrin Logo" 
+                  className="h-20 w-auto"
+                />
               </div>
               <p className="text-gray-600 text-sm font-light">Empowering the future of real estate and AI-driven commerce</p>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-orange-500 transition-colors">Zenstrin</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-orange-500 transition-colors">ZenFinder</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Pricing</a></li>
+                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Zenstrin</a></li>
+                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-orange-500 transition-colors">About</a></li>
-                <li><a href="/blog" className="hover:text-orange-500 transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">About</a></li>
+                <li><a href="/blog" className="hover:text-[#f7961c] transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Security</a></li>
+                <li><a href="/privacy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
@@ -318,8 +325,8 @@ function ContactPage() {
 
 function ContactCard({ icon, title, info, subInfo }: { icon: React.ReactNode; title: string; info: string; subInfo: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-orange-500 transition-colors duration-200">
-      <div className="w-12 h-12 bg-orange-500 text-white flex items-center justify-center mx-auto mb-4 rounded-lg">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-[#f7961c] transition-colors duration-200">
+      <div className="w-12 h-12 bg-[#f7961c] text-white flex items-center justify-center mx-auto mb-4 rounded-lg">
         {icon}
       </div>
       <h3 className="text-lg font-semibold mb-2 text-gray-900">{title}</h3>
@@ -339,7 +346,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
       >
         <span className="font-semibold text-gray-900">{question}</span>
-        <span className={`text-orange-500 text-2xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
+        <span className={`text-[#f7961c] text-2xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
       </button>
       {isOpen && (
         <div className="px-6 pb-4">

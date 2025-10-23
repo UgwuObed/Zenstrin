@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, Menu, X, Calendar, User, Clock, Search } from 'lucide-react';
+import { ArrowRight, Menu, X, Calendar, User, Clock, Search } from 'lucide-react';
 
 function BlogPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -88,39 +88,34 @@ function BlogPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-7 h-7 text-orange-500" />
-              <span className="text-2xl font-semibold text-gray-900">
-                Zenstrin
-              </span>
+              <img 
+                src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                alt="Zenstrin Logo" 
+                className="h-16 w-auto"
+              />
             </div>
 
-            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Home</a>
-              <a href="/blog" className="text-orange-500 font-medium">Blog</a>
-              <a href="/contact" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Contact Us</a>
-              <button className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full">
-                Get Started
+              <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Home</a>
+              <a href="/blog" className="text-[#f7961c] font-medium">Blog</a>
+              <a href="/contact" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Contact Us</a>
+              <button className="px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+                Request Demo
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-gray-900"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
+            <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4 space-y-4">
-              <a href="/" className="block text-gray-700 hover:text-orange-500 transition-colors">Home</a>
-              <a href="/blog" className="block text-orange-500">Blog</a>
-              <a href="/contact" className="block text-gray-700 hover:text-orange-500 transition-colors">Contact Us</a>
-              <button className="w-full px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full">
-                Get Started
+              <a href="/" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Home</a>
+              <a href="/blog" className="block text-[#f7961c]">Blog</a>
+              <a href="/contact" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Contact Us</a>
+              <button className="w-full px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+                Request Demo
               </button>
             </div>
           )}
@@ -137,13 +132,12 @@ function BlogPage() {
             Expert perspectives on property management, AI innovation, and the future of voice commerce.
           </p>
           
-          {/* Search Bar */}
           <div className="max-w-2xl mx-auto relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search articles..."
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-orange-500 transition-colors"
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-[#f7961c] transition-colors"
             />
           </div>
         </div>
@@ -159,7 +153,7 @@ function BlogPage() {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
                   selectedCategory === category
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-[#f7961c] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -176,7 +170,7 @@ function BlogPage() {
           {/* Featured Post */}
           {selectedCategory === 'All' && (
             <div className="mb-16">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-orange-500 transition-colors duration-200">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-colors duration-200">
                 <div className="grid md:grid-cols-2 gap-0">
                   <div className="h-64 md:h-auto bg-gray-200">
                     <img 
@@ -186,7 +180,7 @@ function BlogPage() {
                     />
                   </div>
                   <div className="p-8 md:p-12 flex flex-col justify-center">
-                    <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-medium rounded-full mb-4 w-fit">
+                    <span className="inline-block px-3 py-1 bg-[#f7961c] text-white text-xs font-medium rounded-full mb-4 w-fit">
                       Featured
                     </span>
                     <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-900">
@@ -203,7 +197,7 @@ function BlogPage() {
                       <Clock className="w-4 h-4 mr-2" />
                       <span>{blogPosts[0].readTime}</span>
                     </div>
-                    <button className="group flex items-center text-orange-500 font-medium hover:text-orange-600 transition-colors">
+                    <button className="group flex items-center text-[#f7961c] font-medium hover:text-[#e08515] transition-colors">
                       Read More
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -235,9 +229,9 @@ function BlogPage() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-6 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-orange-500 transition-colors"
+              className="flex-1 px-6 py-3 border border-gray-300 rounded-full focus:outline-none focus:border-[#f7961c] transition-colors"
             />
-            <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors duration-200 rounded-full whitespace-nowrap">
+            <button className="px-8 py-3 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full whitespace-nowrap">
               Subscribe
             </button>
           </div>
@@ -249,34 +243,37 @@ function BlogPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Sparkles className="w-6 h-6 text-orange-500" />
-                <span className="text-xl font-semibold text-gray-900">Zenstrin</span>
+              <div className="mb-4">
+                <img 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                  alt="Zenstrin Logo" 
+                  className="h-20 w-auto"
+                />
               </div>
               <p className="text-gray-600 text-sm font-light">Empowering the future of real estate and AI-driven commerce</p>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-orange-500 transition-colors">Zenstrin</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-orange-500 transition-colors">ZenFinder</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Pricing</a></li>
+                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Zenstrin</a></li>
+                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-orange-500 transition-colors">About</a></li>
-                <li><a href="/blog" className="hover:text-orange-500 transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">About</a></li>
+                <li><a href="/blog" className="hover:text-[#f7961c] transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-orange-500 transition-colors">Security</a></li>
+                <li><a href="/privacy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
@@ -291,7 +288,7 @@ function BlogPage() {
 
 function BlogCard({ post }: { post: any }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-orange-500 transition-all duration-200 hover:shadow-lg">
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-all duration-200 hover:shadow-lg">
       <div className="h-48 bg-gray-200">
         <img 
           src={post.image} 
@@ -315,7 +312,7 @@ function BlogCard({ post }: { post: any }) {
           <Clock className="w-3 h-3 mr-1" />
           <span>{post.readTime}</span>
         </div>
-        <button className="group flex items-center text-orange-500 font-medium hover:text-orange-600 transition-colors text-sm">
+        <button className="group flex items-center text-[#f7961c] font-medium hover:text-[#e08515] transition-colors text-sm">
           Read More
           <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
         </button>
