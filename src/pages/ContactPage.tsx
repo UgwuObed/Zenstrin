@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { httpsCallable } from 'firebase/functions';
+//import { functions } from './firebase/firebase';
+import { functions } from '../firebase/firebase';
+
 
 function ContactPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +18,8 @@ function ContactPage() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -26,67 +32,87 @@ function ContactPage() {
       ...formData,
       [e.target.name]: e.target.value
     });
+ 
+    if (error) setError('');
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (formData.firstName && formData.lastName && formData.email && formData.message) {
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          interest: 'Zenstrin',
-          message: ''
+      setIsSubmitting(true);
+      setError('');
+      
+      try {
+        const newContactMessage = httpsCallable(functions, 'newContactMessage');
+        await newContactMessage({
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`,
+          subject: `${formData.interest}${formData.company ? ' - ' + formData.company : ''}`,
+          comments: formData.message,
+          phone: formData.phone || 'Not provided'
         });
-      }, 3000);
+        
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            company: '',
+            interest: 'Zenstrin',
+            message: ''
+          });
+        }, 3000);
+      } catch (err) {
+        console.error('Error sending message:', err);
+        setError('Failed to send message. Please try again or email us directly.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* Navigation */}
-  <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-white/95 backdrop-blur-sm border-b border-gray-200' : 'bg-white border-b border-gray-200'}`}>
-  <div className="max-w-7xl mx-auto px-6 py-4">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center space-x-2">
-        <img 
-          src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
-          alt="Zenstrin Logo" 
-          className="h-16 w-auto" 
-        />
-      </div>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-white/95 backdrop-blur-sm border-b border-gray-200' : 'bg-white border-b border-gray-200'}`}>
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <img 
+                src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                alt="Zenstrin Logo" 
+                className="h-16 w-auto" 
+              />
+            </div>
 
-      <div className="hidden md:flex items-center space-x-8">
-        <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Home</a>
-        <a href="/blog" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Blog</a>
-        <a href="/contact" className="text-[#f7961c] font-medium">Contact Us</a>
-        <button className="px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
-          Get Started
-        </button>
-      </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Home</a>
+              <a href="/blog" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Blog</a>
+              <a href="/contact" className="text-[#f7961c] font-medium">Contact Us</a>
+              <button className="px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+                Get Started
+              </button>
+            </div>
 
-      <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
-    </div>
+            <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
 
-    {isMenuOpen && (
-      <div className="md:hidden mt-4 pb-4 space-y-4">
-        <a href="/" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Home</a>
-        <a href="/blog" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Blog</a>
-        <a href="/contact" className="block text-[#f7961c]">Contact Us</a>
-        <button className="w-full px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
-          Get Started
-        </button>
-      </div>
-    )}
-  </div>
-</nav>
-
+          {isMenuOpen && (
+            <div className="md:hidden mt-4 pb-4 space-y-4">
+              <a href="/" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Home</a>
+              <a href="/blog" className="block text-gray-700 hover:text-[#f7961c] transition-colors">Blog</a>
+              <a href="/contact" className="block text-[#f7961c]">Contact Us</a>
+              <button className="w-full px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
+                Get Started
+              </button>
+            </div>
+          )}
+        </div>
+      </nav>
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 bg-gradient-to-b from-gray-50 to-white">
@@ -136,6 +162,12 @@ function ContactPage() {
                 </div>
               )}
 
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-800 font-medium">{error}</p>
+                </div>
+              )}
+
               <div className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -147,6 +179,7 @@ function ContactPage() {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="John"
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div>
@@ -158,6 +191,7 @@ function ContactPage() {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="Doe"
+                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
@@ -172,6 +206,7 @@ function ContactPage() {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="john@example.com"
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div>
@@ -183,6 +218,7 @@ function ContactPage() {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                       placeholder="+1 (555) 123-4567"
+                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
@@ -196,6 +232,7 @@ function ContactPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
                     placeholder="Your Company"
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -206,6 +243,7 @@ function ContactPage() {
                     value={formData.interest}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors bg-white"
+                    disabled={isSubmitting}
                   >
                     <option value="Zenstrin">Zenstrin - Property Management</option>
                     <option value="ZenFinder">ZenFinder - Voice Marketplace</option>
@@ -224,15 +262,17 @@ function ContactPage() {
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors resize-none"
                     placeholder="Tell us about your needs..."
+                    disabled={isSubmitting}
                   />
                 </div>
 
                 <button
                   onClick={handleSubmit}
-                  className="w-full md:w-auto px-8 py-3 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full flex items-center justify-center space-x-2"
+                  disabled={isSubmitting}
+                  className="w-full md:w-auto px-8 py-3 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>Send Message</span>
-                  <Send className="w-4 h-4" />
+                  <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+                  {!isSubmitting && <Send className="w-4 h-4" />}
                 </button>
               </div>
             </div>
