@@ -272,7 +272,7 @@ function BlogPage() {
     ? blogPosts 
     : blogPosts.filter(post => post.category === selectedCategory);
 
-  // If a post is selected, show the article detail view
+
   if (selectedPost) {
     return <ArticleDetail post={selectedPost} onBack={() => setSelectedPost(null)} />;
   }
@@ -516,12 +516,15 @@ function BlogCard({ post, onReadMore }: { post: any, onReadMore: () => void }) {
     </div>
   );
 }
-
 function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
+  const relatedPosts = blogPosts.filter(p => 
+    p.id !== post.id && p.category === post.category
+  ).slice(0, 2);
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -533,9 +536,9 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
             </div>
             <button
               onClick={onBack}
-              className="flex items-center text-gray-700 hover:text-[#f7961c] transition-colors font-medium"
+              className="flex items-center text-gray-700 hover:text-[#f7961c] transition-colors font-medium group"
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
+              <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back to Blog
             </button>
           </div>
@@ -547,51 +550,124 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
         <div className="max-w-4xl mx-auto px-6">
           {/* Article Header */}
           <header className="mb-12">
-            <span className="inline-block px-4 py-2 bg-[#f7961c] text-white text-sm font-medium rounded-full mb-6">
+            <span className="inline-block px-4 py-2 bg-[#f7961c] text-white text-sm font-medium rounded-full mb-6 shadow-sm">
               {post.category}
             </span>
-            <h1 className="text-4xl md:text-5xl font-semibold mb-6 text-gray-900 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 leading-tight">
               {post.title}
             </h1>
-            <p className="text-xl text-gray-600 mb-8 font-light leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 font-light leading-relaxed">
               {post.excerpt}
             </p>
-            <div className="flex flex-wrap items-center text-gray-600 gap-6">
+            <div className="flex flex-wrap items-center gap-6 pb-8 border-b border-gray-200">
               <div className="flex items-center">
-                <User className="w-5 h-5 mr-2" />
-                <span className="font-medium">{post.author}</span>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f7961c] to-[#e08515] flex items-center justify-center text-white font-semibold mr-3">
+                  {post.author.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{post.author}</p>
+                  <p className="text-sm text-gray-500">Author</p>
+                </div>
               </div>
-              <div className="flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
+              <div className="flex items-center text-gray-600">
+                <Calendar className="w-5 h-5 mr-2 text-[#f7961c]" />
                 <span>{post.date}</span>
               </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
+              <div className="flex items-center text-gray-600">
+                <Clock className="w-5 h-5 mr-2 text-[#f7961c]" />
                 <span>{post.readTime}</span>
               </div>
             </div>
           </header>
 
           {/* Featured Image */}
-          <div className="mb-12 rounded-lg overflow-hidden">
+          <div className="mb-16 rounded-2xl overflow-hidden shadow-xl">
             <img 
               src={post.image} 
               alt={post.title}
-              className="w-full h-64 md:h-96 object-cover"
+              className="w-full h-72 md:h-[500px] object-cover"
             />
           </div>
 
           {/* Article Body */}
           <div 
-            className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900"
+            className="prose prose-lg md:prose-xl max-w-none 
+            prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-4 prose-headings:mt-8
+            prose-h2:text-3xl prose-h2:border-l-4 prose-h2:border-[#f7961c] prose-h2:pl-4
+            prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
+            prose-li:text-gray-700 prose-li:mb-2
+            prose-strong:text-gray-900 prose-strong:font-semibold
+            prose-ul:my-6 prose-ol:my-6
+            prose-a:text-[#f7961c] prose-a:no-underline hover:prose-a:underline"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
+          {/* Article Footer - Share & Tags */}
+          <div className="mt-16 pt-8 border-t border-gray-200">
+            <div className="flex flex-wrap items-center justify-between gap-6">
+              <div className="flex flex-wrap gap-2">
+                {['AI', 'PropTech', 'Innovation'].map((tag) => (
+                  <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors cursor-pointer">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600 text-sm font-medium">Share:</span>
+                <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-[#f7961c] hover:text-white transition-all flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </button>
+                <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-[#f7961c] hover:text-white transition-all flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                </button>
+                <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-[#f7961c] hover:text-white transition-all flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Related Articles */}
+          {relatedPosts.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-gray-200">
+              <h2 className="text-3xl font-bold mb-8 text-gray-900">Related Articles</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {relatedPosts.map((relatedPost) => (
+                  <div 
+                    key={relatedPost.id}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="group cursor-pointer bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="h-48 bg-gray-200 overflow-hidden">
+                      <img 
+                        src={relatedPost.image} 
+                        alt={relatedPost.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold mb-2 text-gray-900 group-hover:text-[#f7961c] transition-colors">
+                        {relatedPost.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {relatedPost.excerpt}
+                      </p>
+                      <div className="flex items-center text-[#f7961c] font-medium text-sm">
+                        Read Article
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Back to Blog Button */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="mt-16 pt-8 border-t border-gray-200">
             <button
               onClick={onBack}
-              className="group flex items-center text-[#f7961c] font-medium hover:text-[#e08515] transition-colors text-lg"
+              className="group flex items-center text-[#f7961c] font-semibold hover:text-[#e08515] transition-colors text-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back to all articles
