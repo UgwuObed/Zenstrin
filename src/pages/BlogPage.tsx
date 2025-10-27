@@ -284,20 +284,19 @@ function BlogPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <img 
-                src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
-                alt="Zenstrin Logo" 
-                className="h-16 w-auto"
-              />
+              <a href="/">
+                <img 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                  alt="Zenstrin Logo" 
+                  className="h-16 w-auto" 
+                />
+              </a>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Home</a>
+              <a href="/" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Zenstrin</a>
               <a href="/blog" className="text-[#f7961c] font-medium">Blog</a>
               <a href="/contact" className="text-gray-700 hover:text-[#f7961c] transition-colors font-medium">Contact Us</a>
-              <button className="px-6 py-2 bg-[#f7961c] hover:bg-[#e08515] text-white font-medium transition-colors duration-200 rounded-full">
-                Request Demo
-              </button>
             </div>
 
             <button className="md:hidden text-gray-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -434,14 +433,14 @@ function BlogPage() {
         </div>
       </section>
 
-      {/* Footer */}
+    {/* Footer */}
       <footer className="border-t border-gray-200 py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-4">
                 <img 
-                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png" 
                   alt="Zenstrin Logo" 
                   className="h-20 w-auto"
                 />
@@ -451,25 +450,20 @@ function BlogPage() {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Zenstrin</a></li>
+                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
                 <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">About</a></li>
                 <li><a href="/blog" className="hover:text-[#f7961c] transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li><a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
@@ -698,14 +692,14 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
         </div>
       </section>
 
-      {/* Footer */}
+{/* Footer */}
       <footer className="border-t border-gray-200 py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-4">
                 <img 
-                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761204095/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b_kccec1.jpg" 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png" 
                   alt="Zenstrin Logo" 
                   className="h-20 w-auto"
                 />
@@ -715,25 +709,20 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Zenstrin</a></li>
+                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
                 <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">About</a></li>
                 <li><a href="/blog" className="hover:text-[#f7961c] transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li><a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-[#f7961c] transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
