@@ -391,12 +391,12 @@ function HomePage() {
               <h3 className="font-semibold text-gray-900 mb-6 text-lg">Company</h3>
               <ul className="space-y-3 text-gray-600 text-sm">
                 <li>
-                  <a href="#blog" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
+                  <a href="/blog" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#contact-us" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
+                  <a href="/contact" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
                     Contact Us
                   </a>
                 </li>
