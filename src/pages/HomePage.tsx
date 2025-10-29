@@ -780,8 +780,8 @@ export default function ZenstrinLandingPage() {
             <div className="footer-links">
               <a href="#zenstrin">Zenstrin</a>
               <a href="#zenfinder">ZenFinder</a>
-              <a href="#blog">Blog</a>
-              <a href="#contact">Contact</a>
+              <a href="/blog">Blog</a>
+              <a href="/contact">Contact</a>
               <a href="/privacy-policy">Privacy</a>
             </div>
           </div>
