@@ -653,9 +653,8 @@ export default function ZenstrinLandingPage() {
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
         <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>Zenstrin</a>
         <a href="#zenfinder" onClick={() => setIsMenuOpen(false)}>ZenFinder</a>
-        <a href="#blog" onClick={() => setIsMenuOpen(false)}>Blog</a>
-        <a href="#contact" onClick={() => setIsMenuOpen(false)}>Contact Us</a>
-        <a href="#" className="nav-cta">Get Started ↗</a>
+        <a href="/blog" onClick={() => setIsMenuOpen(false)}>Blog</a>
+        <a href="/contact" className="nav-cta">Contact Us ↗</a>
       </div>
 
       <section 
@@ -667,12 +666,12 @@ export default function ZenstrinLandingPage() {
         <div className="code-background" ref={codeBackgroundRef}></div>
         <div className="container">
           <div className="hero-content">
-            <div className="hero-tag">[ EMPOWERING REAL ESTATE ]</div>
+            <div className="hero-tag">[ EMPOWERING MARKETPLACE & REAL ESTATE ]</div>
             <h1>
               WE'RE THE MAKERS OF
-              <span className="highlight">[ ZENSTRIN ]</span>
+              <span className="highlight">[ ZENFINDER ]</span>
             </h1>
-            <p className="hero-subtitle">The AI-powered property management platform</p>
+            <p className="hero-subtitle">Voice-first AI marketplace</p>
             <div className="hero-buttons">
               <a href="#" className="btn-primary">REQUEST DEMO ↗</a>
               <a href="#" className="btn-secondary">LEARN MORE ↗</a>
