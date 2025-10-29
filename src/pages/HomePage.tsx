@@ -92,14 +92,19 @@ export default function ZenstrinLandingPage() {
           padding: 0;
           box-sizing: border-box;
         }
+
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           color: #1a1a1a;
           line-height: 1.6;
           overflow-x: hidden;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
-        
+
         .landing-page {
           width: 100%;
           overflow-x: hidden;
@@ -680,47 +685,66 @@ export default function ZenstrinLandingPage() {
         </div>
       </section>
 
-      <section id="zenstrin" className="white-section">
+     <section id="zenstrin" className="white-section">
         <div className="container">
           <div className="section-header">
-            <div className="section-tag">ZENSTRIN PLATFORM</div>
-            <h2 className="section-title">Complete property management ecosystem</h2>
+            <div className="section-tag">Zenstrin Platform</div>
+            <h2 className="section-title">Enterprise property management solution</h2>
             <p className="section-description">
-              A complete ecosystem for landlords, agents, and property managers to manage their 
-              portfolios effortlessly. Save up to 30% in administrative time with automation.
+              Streamline operations across your entire portfolio with intelligent automation. 
+              Reduce administrative overhead by 30% while improving tenant satisfaction and compliance tracking.
             </p>
           </div>
           
           <div className="feature-grid">
             <div className="feature-card">
-              <div className="feature-icon">🏠</div>
-              <h3 className="feature-title">Tenant & Lease Management</h3>
+              <div className="feature-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </div>
+              <h3 className="feature-title">Lease Administration</h3>
               <p className="feature-text">
-                Simplify renewals, rent tracking, and communication with an intuitive dashboard.
+                Centralized tenant management with automated renewals, digital signatures, and rent collection tracking. Real-time visibility across all properties.
               </p>
             </div>
             
             <div className="feature-card">
-              <div className="feature-icon">🔧</div>
-              <h3 className="feature-title">Maintenance Automation</h3>
+              <div className="feature-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+              </div>
+              <h3 className="feature-title">Work Order Management</h3>
               <p className="feature-text">
-                Log issues, assign contractors, and monitor progress in real-time.
+                End-to-end maintenance workflow from request submission to completion. Contractor assignment, progress tracking, and automated status updates.
               </p>
             </div>
             
             <div className="feature-card">
-              <div className="feature-icon">💰</div>
-              <h3 className="feature-title">Financial Sync</h3>
+              <div className="feature-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <h3 className="feature-title">Financial Integration</h3>
               <p className="feature-text">
-                Integrate with tools like Xero for seamless accounting and reporting.
+                Seamless synchronization with Xero, QuickBooks, and major accounting platforms. Automated reconciliation, expense tracking, and financial reporting.
               </p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">✓</div>
-              <h3 className="feature-title">Compliance Hub</h3>
+              <div className="feature-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <h3 className="feature-title">Regulatory Compliance</h3>
               <p className="feature-text">
-                Stay on top of safety, inspections, and legal obligations effortlessly.
+                Automated compliance monitoring with scheduled inspections, safety certifications, and regulatory deadline tracking. Stay audit-ready at all times.
               </p>
             </div>
           </div>
