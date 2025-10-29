@@ -2,56 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply antialiased;
+@layer utilities {
+  .z-1000 {
+    z-index: 1000;
+  }
+  
+  .py-30 {
+    padding-top: 7.5rem;
+    padding-bottom: 7.5rem;
+  }
+  
+  .mt-15 {
+    margin-top: 3.75rem;
+  }
+  
+  .mb-7\.5 {
+    margin-bottom: 1.875rem;
   }
 }
 
-@layer utilities {
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
+/* Custom scrollbar for code background */
+.code-background {
+  font-family: 'Courier New', monospace;
+  animation: scrollCode 60s linear infinite;
+}
 
-  @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+.mouse-distortion {
+  width: 250px;
+  height: 250px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
 
-  @keyframes gradient {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
+@keyframes scrollCode {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20%); }
+}
 
-  .animate-fade-in {
-    animation: fade-in 0.8s ease-out;
-  }
+.code-line {
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite;
+  transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
+}
 
-  .animate-fade-in-up {
-    animation: fade-in-up 0.8s ease-out;
-  }
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
 
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 3s ease infinite;
-  }
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
 
-  html {
-    scroll-behavior: smooth;
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 3rem !important;
   }
+  
+  .hero-subtitle {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Add to your globals.css or tailwind.css */
+.code-background {
+  font-family: 'Courier New', monospace;
+  animation: scrollCode 60s linear infinite;
+}
+
+.mouse-distortion {
+  width: 250px;
+  height: 250px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+
+@keyframes scrollCode {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20%); }
+}
+
+.code-line {
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite;
+  transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Ensure proper z-index for sections */
+section {
+  position: relative;
+  z-index: 10;
 }

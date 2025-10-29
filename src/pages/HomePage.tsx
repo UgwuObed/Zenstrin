@@ -1,445 +1,793 @@
-"use client"
+import React, { useEffect, useRef, useState } from 'react';
 
-import { useState, useEffect, useRef } from "react"
-import { ArrowRight, Menu, X, Play, Pause } from "lucide-react"
-
-function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+export default function ZenstrinLandingPage() {
+  const codeBackgroundRef = useRef<HTMLDivElement | null>(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [scrollY, setScrollY] = useState<number>(0);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
-    if (!canvasRef.current) return
+    const codeBackground = codeBackgroundRef.current;
+    if (!codeBackground) return;
 
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext("2d", { alpha: false })
-    if (!ctx) return
+    const characters = '+-=/*<>[]{}()#@$%&|\\';
+    const charsPerLine = 200;
+    const lines = 100;
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
-
-    const shapes: Array<{
-      x: number
-      y: number
-      baseRadius: number
-      currentRadius: number
-      morphPhase: number
-      speed: number
-      color: string
-      vx: number
-      vy: number
-    }> = []
-
-    const colors = [
-      "rgba(247, 150, 28, 0.06)",
-      "rgba(247, 150, 28, 0.04)", 
-      "rgba(247, 150, 28, 0.03)"
-    ]
-    
-    for (let i = 0; i < 3; i++) {
-      shapes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        baseRadius: 100 + Math.random() * 100,
-        currentRadius: 100 + Math.random() * 100,
-        morphPhase: Math.random() * Math.PI * 2,
-        speed: 0.002 + Math.random() * 0.001,
-        color: colors[i],
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: (Math.random() - 0.5) * 0.2
-      })
-    }
-
-    let animationFrame: number
-    let lastTime = Date.now()
-
-    const animate = () => {
-      const currentTime = Date.now()
-      const deltaTime = Math.min((currentTime - lastTime) / 16, 2)
-      lastTime = currentTime
-
-      if (!isPlaying) {
-        animationFrame = requestAnimationFrame(animate)
-        return
-      }
-
-      ctx.fillStyle = "#ffffff"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      shapes.forEach((shape) => {
-        shape.morphPhase += shape.speed * deltaTime
-
-        const morphAmount = Math.sin(shape.morphPhase) * 0.25
-        shape.currentRadius = shape.baseRadius * (1 + morphAmount)
-
-        ctx.fillStyle = shape.color
-        ctx.beginPath()
-
-        const points = 6
-        for (let i = 0; i < points; i++) {
-          const angle = (i / points) * Math.PI * 2
-          const distortion = Math.sin(shape.morphPhase + angle * 2) * 12
-          const radius = shape.currentRadius + distortion
-          const px = shape.x + Math.cos(angle) * radius
-          const py = shape.y + Math.sin(angle) * radius
-
-          if (i === 0) ctx.moveTo(px, py)
-          else ctx.lineTo(px, py)
+    let codeHTML = '';
+    for (let i = 0; i < lines; i++) {
+      let line = '';
+      for (let j = 0; j < charsPerLine; j++) {
+        if (Math.random() > 0.7) {
+          line += characters[Math.floor(Math.random() * characters.length)];
+        } else {
+          line += ' ';
         }
-        ctx.closePath()
-        ctx.fill()
-
-        shape.x += shape.vx * deltaTime
-        shape.y += shape.vy * deltaTime
-
-        if (shape.x < -200) shape.x = canvas.width + 200
-        if (shape.x > canvas.width + 200) shape.x = -200
-        if (shape.y < -200) shape.y = canvas.height + 200
-        if (shape.y > canvas.height + 200) shape.y = -200
-      })
-
-      animationFrame = requestAnimationFrame(animate)
+      }
+      const delay = i * 0.02;
+      const duration = 2 + Math.random() * 2;
+      codeHTML += `<div class="code-line" style="animation-delay: ${delay}s; animation-duration: ${duration}s">${line}</div>`;
     }
+    codeBackground.innerHTML = codeHTML;
+  }, []);
 
-    animate()
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroRef.current) return;
+    
+    const rect = heroRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-    return () => {
-      window.removeEventListener("resize", resizeCanvas)
-      cancelAnimationFrame(animationFrame)
-    }
-  }, [isPlaying])
+    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>('.code-line');
+    codeLines.forEach((line) => {
+      const lineRect = line.getBoundingClientRect();
+      const lineY = lineRect.top - rect.top + lineRect.height / 2;
+      const lineX = lineRect.left - rect.left + lineRect.width / 2;
+
+      const distance = Math.hypot(lineX - mouseX, lineY - mouseY);
+
+      if (distance < 150) {
+        const intensity = (150 - distance) / 150;
+        const dx = lineX - mouseX;
+        const dy = lineY - mouseY;
+        const angle = Math.atan2(dy, dx);
+        const pushAmount = intensity * intensity * 20;
+        const pushX = Math.cos(angle) * pushAmount;
+        const pushY = Math.sin(angle) * pushAmount;
+        const glowIntensity = intensity * 0.8;
+
+        (line as HTMLElement).style.transform = `translate(${pushX}px, ${pushY}px) scale(${1 + intensity * 0.12})`;
+        (line as HTMLElement).style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`;
+        (line as HTMLElement).style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`;
+      } else {
+        (line as HTMLElement).style.transform = 'translate(0, 0) scale(1)';
+        (line as HTMLElement).style.textShadow = 'none';
+        (line as HTMLElement).style.color = 'rgba(100, 150, 200, 0.25)';
+      }
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!heroRef.current) return;
+    
+    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>('.code-line');
+    codeLines.forEach(line => {
+      (line as HTMLElement).style.transform = 'translate(0, 0) scale(1)';
+      (line as HTMLElement).style.textShadow = 'none';
+      (line as HTMLElement).style.color = 'rgba(100, 150, 200, 0.25)';
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 relative font-sans">
-      {/* Animated Canvas Background */}
-      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" style={{ willChange: 'contents' }} />
+    <div className="landing-page">
+      <style>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+          color: #1a1a1a;
+          line-height: 1.6;
+          overflow-x: hidden;
+        }
+        
+        .landing-page {
+          width: 100%;
+          overflow-x: hidden;
+        }
+        
+        .container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 40px;
+        }
+        
+        header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          padding: 20px 0;
+          z-index: 1000;
+          transition: all 0.3s ease;
+        }
 
-      {/* Background Animation Control */}
-      <button
-        onClick={() => setIsPlaying(!isPlaying)}
-        className="fixed top-6 right-6 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-        aria-label={isPlaying ? "Pause animation" : "Play animation"}
-      >
-        {isPlaying ? <Pause className="w-5 h-5 text-gray-700" /> : <Play className="w-5 h-5 text-gray-700" />}
-      </button>
+        header.scrolled {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .logo img {
+          height: 50px;
+          width: auto;
+        }
+        
+        .nav-links {
+          display: flex;
+          gap: 40px;
+          list-style: none;
+          align-items: center;
+        }
+        
+        .nav-links a {
+          color: #ffffff;
+          text-decoration: none;
+          font-size: 15px;
+          font-weight: 500;
+          transition: color 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          position: relative;
+        }
 
-      {/* Navigation */}
-      <nav
-        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-          scrollY > 50
-            ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+        header.scrolled .nav-links a {
+          color: #1a1a1a;
+        }
+
+        .nav-links a::after {
+          content: '';
+          position: absolute;
+          bottom: -4px;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: #f7961c;
+          transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+          color: white;
+        }
+
+        .nav-links a:hover::after {
+          width: 100%;
+        }
+        
+        .nav-cta {
+          background: #1a1a1a;
+          color: #ffffff;
+          padding: 12px 24px;
+          border-radius: 6px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        header.scrolled .nav-cta {
+          background: #f7961c;
+          border-color: #f7961c;
+        }
+        
+        .nav-cta:hover {
+          background: #f7961c;
+          border-color: #f7961c;
+          transform: translateY(-2px);
+        }
+
+        .mobile-menu-btn {
+          display: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 8px;
+          z-index: 1001;
+        }
+
+        .mobile-menu-btn svg {
+          width: 24px;
+          height: 24px;
+          stroke: #ffffff;
+        }
+
+        header.scrolled .mobile-menu-btn svg {
+          stroke: #1a1a1a;
+        }
+
+        .mobile-menu {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(12px);
+          padding: 80px 40px 40px;
+          z-index: 999;
+          animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .mobile-menu.open {
+          display: block;
+        }
+
+        .mobile-menu a {
+          display: block;
+          padding: 16px 0;
+          color: #1a1a1a;
+          text-decoration: none;
+          font-size: 18px;
+          font-weight: 500;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          transition: color 0.3s ease;
+        }
+
+        .mobile-menu a:hover {
+          color: #f7961c;
+        }
+
+        .mobile-menu .nav-cta {
+          margin-top: 20px;
+          display: inline-block;
+        }
+        
+        .hero {
+          position: relative;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          background: #0a0a0f;
+          overflow: hidden;
+        }
+        
+        .code-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          line-height: 1.5;
+          color: rgba(100, 150, 200, 0.25);
+          overflow: hidden;
+          white-space: pre;
+          pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          animation: scrollCode 60s linear infinite;
+          z-index: 2;
+        }
+        
+        @keyframes scrollCode {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-20%); }
+        }
+        
+        .code-line {
+          opacity: 0;
+          animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite;
+          transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
+        }
+        
+        @keyframes fadeIn {
+          to { opacity: 1; }
+        }
+        
+        @keyframes shimmer {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
+        }
+        
+        .hero-content {
+          position: relative;
+          z-index: 10;
+          max-width: 1000px;
+        }
+        
+        .hero-tag {
+          display: inline-block;
+          padding: 10px 20px;
+          background: rgba(247, 150, 28, 0.15);
+          border: 1px solid rgba(247, 150, 28, 0.3);
+          border-radius: 4px;
+          color: #a8c5e6;
+          font-size: 13px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 40px;
+        }
+        
+        h1 {
+          font-size: 80px;
+          font-weight: 700;
+          color: #ffffff;
+          margin-bottom: 20px;
+          line-height: 1.1;
+        }
+        
+        h1 .highlight {
+          color: #f7961c;
+          display: block;
+        }
+        
+        .hero-subtitle {
+          font-size: 28px;
+          color: #a0a0a0;
+          margin-bottom: 50px;
+          font-weight: 400;
+        }
+        
+        .hero-buttons {
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+          display: inline-block;
+          padding: 18px 40px;
+          background: #ffffff;
+          color: #0a0a0f;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          border: 2px solid #ffffff;
+          cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+          background: #f7961c;
+          border-color: #f7961c;
+          color: #ffffff;
+          transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+          display: inline-block;
+          padding: 18px 40px;
+          background: transparent;
+          color: #ffffff;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+          border-color: #f7961c;
+          color: #f7961c;
+        }
+        
+        .white-section {
+          background: #ffffff;
+          padding: 120px 0;
+        }
+        
+        .section-header {
+          text-align: center;
+          max-width: 800px;
+          margin: 0 auto 80px;
+        }
+        
+        .section-tag {
+          color: #f7961c;
+          font-size: 14px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          margin-bottom: 20px;
+        }
+        
+        .section-title {
+          font-size: 48px;
+          font-weight: 700;
+          color: #1a1a1a;
+          margin-bottom: 20px;
+          line-height: 1.2;
+        }
+        
+        .section-description {
+          font-size: 20px;
+          color: #666;
+          line-height: 1.6;
+        }
+        
+        .feature-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 40px;
+          margin-top: 60px;
+        }
+        
+        .feature-card {
+          padding: 40px;
+          background: #fafafa;
+          border-radius: 12px;
+          transition: all 0.3s ease;
+          border: 2px solid transparent;
+        }
+        
+        .feature-card:hover {
+          transform: translateY(-5px);
+          border-color: #f7961c;
+          box-shadow: 0 10px 30px rgba(247, 150, 28, 0.1);
+        }
+        
+        .feature-icon {
+          width: 60px;
+          height: 60px;
+          background: #f7961c;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          margin-bottom: 25px;
+          color: #ffffff;
+        }
+        
+        .feature-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: #1a1a1a;
+          margin-bottom: 15px;
+        }
+        
+        .feature-text {
+          font-size: 16px;
+          color: #666;
+          line-height: 1.6;
+        }
+        
+        .team-section {
+          background: #f7961c;
+          padding: 120px 0;
+          color: #ffffff;
+        }
+        
+        .team-section .section-tag {
+          color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .team-section .section-title {
+          color: #ffffff;
+        }
+        
+        .team-section .section-description {
+          color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stats {
+          display: flex;
+          justify-content: center;
+          gap: 80px;
+          flex-wrap: wrap;
+          margin-top: 60px;
+        }
+        
+        .stat {
+          text-align: center;
+        }
+        
+        .stat-number {
+          font-size: 64px;
+          font-weight: 700;
+          color: #ffffff;
+          display: block;
+          margin-bottom: 10px;
+        }
+        
+        .stat-label {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 500;
+        }
+        
+        .cta-section {
+          background: #0a0a0f;
+          padding: 120px 0;
+          text-align: center;
+          color: #ffffff;
+        }
+        
+        .cta-section .section-title {
+          color: #ffffff;
+          margin-bottom: 30px;
+        }
+        
+        .cta-section .section-description {
+          color: #a0a0a0;
+          margin-bottom: 50px;
+        }
+        
+        footer {
+          background: #ffffff;
+          padding: 60px 0 40px;
+          border-top: 1px solid #e0e0e0;
+        }
+        
+        .footer-content {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 40px;
+          flex-wrap: wrap;
+          gap: 40px;
+        }
+        
+        .footer-links {
+          display: flex;
+          gap: 40px;
+        }
+        
+        .footer-links a {
+          color: #666;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+          color: #f7961c;
+        }
+        
+        .copyright {
+          text-align: center;
+          color: #999;
+          font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+          h1 {
+            font-size: 48px;
+          }
+          
+          .hero-subtitle {
+            font-size: 20px;
+          }
+          
+          .nav-links {
+            display: none;
+          }
+
+          .mobile-menu-btn {
+            display: block;
+          }
+          
+          .container {
+            padding: 0 20px;
+          }
+          
+          .feature-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .stats {
+            gap: 40px;
+          }
+        }
+      `}</style>
+
+      <header className={scrollY > 50 ? 'scrolled' : ''}>
+        <div className="container">
+          <nav>
+            <div className="logo">
               <img
                 src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png"
                 alt="Zenstrin Logo"
-                className="h-10 w-auto"
               />
             </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              {["Zenstrin", "ZenFinder", "Blog", "Contact Us"].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase().replace(" ", "-")}`}
-                  className="relative text-gray-700 hover:text-[#f7961c] transition-colors duration-300 font-medium text-sm group"
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#f7961c] transition-all duration-300 group-hover:w-full"></span>
-                </a>
-              ))}
-            </div>
-
-            {/* Mobile Menu Button */}
+            <ul className="nav-links">
+              <li><a href="#zenstrin">Zenstrin</a></li>
+              <li><a href="#zenfinder">ZenFinder</a></li>
+              <li><a href="/blog">Blog</a></li>
+              <li><a href="/contact" className="nav-cta">Contact Us ↗</a></li>
+            </ul>
             <button 
-              className="md:hidden text-gray-700 z-50" 
+              className="mobile-menu-btn" 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
-                <X className="w-6 h-6 transition-transform duration-300" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
               ) : (
-                <Menu className="w-6 h-6 transition-transform duration-300" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 12h18M3 6h18M3 18h18" />
+                </svg>
               )}
             </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden absolute top-full left-0 w-full bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-lg">
-              <div className="p-6 space-y-4">
-                {["Zenstrin", "ZenFinder", "Blog", "Contact Us"].map((item) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase().replace(" ", "-")}`}
-                    className="block text-gray-700 hover:text-[#f7961c] transition-colors duration-300 font-medium py-2 border-b border-gray-100 last:border-0"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item}
-                  </a>
-                ))}
-                <button className="w-full px-6 py-3 bg-[#f7961c] text-white font-semibold transition-all duration-300 rounded-lg hover:bg-[#e0861a] mt-4">
-                  Get Started
-                </button>
-              </div>
-            </div>
-          )}
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 pt-20">
-        <div className="relative max-w-6xl mx-auto text-center space-y-8 z-10">
-          <div className="flex justify-center mb-8">
-            <div className="h-px w-32 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-          </div>
+      <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+        <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>Zenstrin</a>
+        <a href="#zenfinder" onClick={() => setIsMenuOpen(false)}>ZenFinder</a>
+        <a href="#blog" onClick={() => setIsMenuOpen(false)}>Blog</a>
+        <a href="#contact" onClick={() => setIsMenuOpen(false)}>Contact Us</a>
+        <a href="#" className="nav-cta">Get Started ↗</a>
+      </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-tight">
-            <span className="block text-gray-900">Empowering the</span>
-            <span className="block text-[#f7961c] mt-4">Future of Real Estate</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
-            Intelligent platforms that merge AI innovation with human experience, creating products that redefine speed,
-            trust, and simplicity in the digital world.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12">
-            <button className="group relative px-10 py-4 bg-[#f7961c] text-white font-semibold transition-all duration-300 flex items-center space-x-3 rounded-lg hover:bg-[#e0861a] hover:shadow-xl hover:-translate-y-1">
-              <span className="relative">Request Demo</span>
-              <ArrowRight className="w-5 h-5 relative group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
-            <button className="px-10 py-4 border-2 border-gray-900 text-gray-900 font-semibold transition-all duration-300 rounded-lg hover:bg-gray-900 hover:text-white hover:-translate-y-1">
-              Learn More
-            </button>
+      <section 
+        className="hero" 
+        ref={heroRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="code-background" ref={codeBackgroundRef}></div>
+        <div className="container">
+          <div className="hero-content">
+            <div className="hero-tag">[ EMPOWERING REAL ESTATE ]</div>
+            <h1>
+              WE'RE THE MAKERS OF
+              <span className="highlight">[ ZENSTRIN ]</span>
+            </h1>
+            <p className="hero-subtitle">The AI-powered property management platform</p>
+            <div className="hero-buttons">
+              <a href="#" className="btn-primary">REQUEST DEMO ↗</a>
+              <a href="#" className="btn-secondary">LEARN MORE ↗</a>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Zenstrin Features Section */}
-      <section id="zenstrin" className="py-32 px-6 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-bold mb-8 text-gray-900">Zenstrin</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light mb-6 leading-relaxed">
-              A complete ecosystem for landlords, agents, and property managers to manage their portfolios effortlessly.
-            </p>
-            <div className="inline-flex items-center px-6 py-3 bg-orange-50 border border-orange-200 rounded-full">
-              <span className="text-[#f7961c] font-semibold text-lg">
-                Save up to 30% in administrative time with automation
-              </span>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-            <FeatureCard
-              title="Tenant & Lease Management"
-              description="Simplify renewals, rent tracking, and communication."
-            />
-            <FeatureCard
-              title="Maintenance Automation"
-              description="Log issues, assign contractors, and monitor progress."
-            />
-            <FeatureCard
-              title="Financial Sync"
-              description="Integrate with tools like Xero for seamless accounting."
-            />
-            <FeatureCard
-              title="Compliance Hub"
-              description="Stay on top of safety, inspections, and legal obligations."
-            />
-          </div>
-
-          <div className="max-w-4xl mx-auto bg-gradient-to-br from-orange-50 to-white border border-orange-200 p-10 text-center rounded-2xl shadow-sm">
-            <p className="text-gray-700 text-lg font-light mb-4 leading-relaxed">
-              <span className="font-semibold text-[#f7961c]">Why Zenstrin?</span> The global property management software
-              market is expected to reach <span className="font-semibold text-[#f7961c]">$5.4 billion by 2030</span>, growing
-              at 8.1% CAGR.
-            </p>
-            <p className="text-gray-600 font-light text-sm">
-              Help small to mid-size agencies stay competitive through modern tech adoption without enterprise
-              complexity.
+      <section id="zenstrin" className="white-section">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-tag">ZENSTRIN PLATFORM</div>
+            <h2 className="section-title">Complete property management ecosystem</h2>
+            <p className="section-description">
+              A complete ecosystem for landlords, agents, and property managers to manage their 
+              portfolios effortlessly. Save up to 30% in administrative time with automation.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* ZenFinder Features Section */}
-      <section id="zenfinder" className="py-32 px-6 relative z-10 bg-gradient-to-b from-transparent to-orange-50/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-bold mb-8 text-gray-900">ZenFinder</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light mb-6 leading-relaxed">
-              Find a service provider in seconds — just by speaking. An AI-powered, voice-first marketplace that
-              instantly connects users with real service providers.
-            </p>
-            <div className="inline-flex items-center px-6 py-3 bg-white border border-orange-200 rounded-full shadow-sm">
-              <span className="text-[#f7961c] font-semibold text-lg">
-                Voice commerce market forecasted to exceed $55 billion by 2026
-              </span>
-            </div>
-          </div>
-
-          {/* How It Works */}
-          <div className="max-w-5xl mx-auto mb-20">
-            <h3 className="text-3xl font-bold text-center mb-16 text-gray-900">How It Works</h3>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { step: "1", title: "User Speaks Their Need", desc: '"I need a plumber."', icon: "🎤" },
-                { step: "2", title: "AI Instantly Matches", desc: "Finds qualified options nearby.", icon: "🤖" },
-                { step: "3", title: "Live Connection", desc: "Connects both parties in real-time.", icon: "🔗" },
-              ].map((item, i) => (
-                <div key={i} className="text-center group">
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 bg-white border-2 border-orange-200 text-[#f7961c] flex items-center justify-center mx-auto rounded-2xl text-4xl shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all duration-300 group-hover:border-[#f7961c]">
-                      {item.icon}
-                    </div>
-                  </div>
-                  <h4 className="font-semibold text-lg mb-3 text-gray-900 group-hover:text-[#f7961c] transition-colors duration-300">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-600 font-light leading-relaxed text-sm">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Core Values */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard title="Speed" description="Connects to a provider in seconds." />
-            <FeatureCard title="Simplicity" description="Voice-driven, no forms or browsing." />
-            <FeatureCard title="Human Touch" description="Real conversations, not chatbots." />
-            <FeatureCard
-              title="Breadth"
-              description="From plumbers to personal trainers — one platform for all."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-32 px-6 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-gray-900">The Future of Simplicity is Here</h2>
-          <p className="text-xl text-gray-600 mb-12 font-light max-w-3xl mx-auto leading-relaxed">
-            Whether you're managing properties or finding a reliable professional, Zenstrin Technologies bridges the gap
-            between AI automation and human interaction — delivering trust, speed, and intelligence at scale.
-          </p>
-          <button className="group relative px-12 py-5 bg-[#f7961c] text-white font-semibold transition-all duration-300 flex items-center space-x-3 mx-auto rounded-lg hover:bg-[#e0861a] hover:shadow-xl hover:-translate-y-1">
-            <span className="relative text-lg">Get Started Today</span>
-            <ArrowRight className="w-6 h-6 relative group-hover:translate-x-2 transition-transform duration-300" />
-          </button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-16 px-6 bg-white relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <div className="flex items-center space-x-3 mb-6">
-                <img
-                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png"
-                  alt="Zenstrin Logo"
-                  className="h-12 w-auto"
-                />
-                <span className="text-xl font-semibold text-gray-900">ZENSTRIN</span>
-              </div>
-              <p className="text-gray-600 text-sm font-light leading-relaxed">
-                Empowering the future of real estate and AI-driven commerce with cutting-edge technology and
-                human-centric design.
+          
+          <div className="feature-grid">
+            <div className="feature-card">
+              <div className="feature-icon">🏠</div>
+              <h3 className="feature-title">Tenant & Lease Management</h3>
+              <p className="feature-text">
+                Simplify renewals, rent tracking, and communication with an intuitive dashboard.
               </p>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-6 text-lg">Products</h3>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li>
-                  <a
-                    href="#zenstrin"
-                    className="hover:text-[#f7961c] transition-colors duration-300 font-medium"
-                  >
-                    Property Management Software
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#zenfinder"
-                    className="hover:text-[#f7961c] transition-colors duration-300 font-medium"
-                  >
-                    ZenFinder
-                  </a>
-                </li>
-              </ul>
+            
+            <div className="feature-card">
+              <div className="feature-icon">🔧</div>
+              <h3 className="feature-title">Maintenance Automation</h3>
+              <p className="feature-text">
+                Log issues, assign contractors, and monitor progress in real-time.
+              </p>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-6 text-lg">Company</h3>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li>
-                  <a href="/blog" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="/contact" className="hover:text-[#f7961c] transition-colors duration-300 font-medium">
-                    Contact Us
-                  </a>
-                </li>
-              </ul>
+            
+            <div className="feature-card">
+              <div className="feature-icon">💰</div>
+              <h3 className="feature-title">Financial Sync</h3>
+              <p className="feature-text">
+                Integrate with tools like Xero for seamless accounting and reporting.
+              </p>
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-6 text-lg">Legal</h3>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li>
-                  <a
-                    href="#privacy-policy"
-                    className="hover:text-[#f7961c] transition-colors duration-300 font-medium"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-              </ul>
+
+            <div className="feature-card">
+              <div className="feature-icon">✓</div>
+              <h3 className="feature-title">Compliance Hub</h3>
+              <p className="feature-text">
+                Stay on top of safety, inspections, and legal obligations effortlessly.
+              </p>
             </div>
           </div>
-          <div className="pt-8 border-t border-gray-200 text-center text-gray-500 text-sm">
-            <p>&copy; 2025 Zenstrin Technologies. All rights reserved. Building the future, today.</p>
+        </div>
+      </section>
+
+      <section id="zenfinder" className="team-section">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-tag">ZENFINDER</div>
+            <h2 className="section-title">Voice-first AI marketplace</h2>
+            <p className="section-description">
+              Find a service provider in seconds — just by speaking. An AI-powered, voice-first 
+              marketplace that instantly connects users with real service providers.
+            </p>
           </div>
+          
+          <div className="stats">
+            <div className="stat">
+              <span className="stat-number">⚡</span>
+              <span className="stat-label">Instant Connections</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">🎤</span>
+              <span className="stat-label">Voice-Driven</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">🤝</span>
+              <span className="stat-label">Human Touch</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="blog" className="cta-section">
+        <div className="container">
+          <h2 className="section-title">The future of simplicity is here</h2>
+          <p className="section-description">
+            Whether you're managing properties or finding a reliable professional, Zenstrin 
+            Technologies bridges the gap between AI automation and human interaction.
+          </p>
+          <a href="#contact" className="btn-primary">Get Started Today</a>
+        </div>
+      </section>
+
+      <footer id="contact">
+        <div className="container">
+          <div className="footer-content">
+            <div className="logo">
+              <img
+                src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png"
+                alt="Zenstrin Logo"
+                style={{ height: '40px' }}
+              />
+            </div>
+            <div className="footer-links">
+              <a href="#zenstrin">Zenstrin</a>
+              <a href="#zenfinder">ZenFinder</a>
+              <a href="#blog">Blog</a>
+              <a href="#contact">Contact</a>
+              <a href="/privacy-policy">Privacy</a>
+            </div>
+          </div>
+          <p className="copyright">© 2025 Zenstrin Technologies. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
-
-function FeatureCard({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="group relative p-8 bg-white border border-gray-200 hover:border-[#f7961c] transition-all duration-300 rounded-2xl hover:shadow-lg hover:-translate-y-1">
-      <div className="relative mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#f7961c] to-[#e0861a] text-white flex items-center justify-center rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300">
-          <div className="text-xl font-bold">✦</div>
-        </div>
-      </div>
-
-      <h3 className="text-xl font-semibold mb-3 text-gray-900 group-hover:text-[#f7961c] transition-colors duration-300">
-        {title}
-      </h3>
-      <p className="text-gray-600 font-light leading-relaxed text-sm">{description}</p>
-    </div>
-  )
-}
-
-export default HomePage
