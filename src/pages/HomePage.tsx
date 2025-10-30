@@ -5,11 +5,16 @@ export default function ZenstrinLandingPage() {
   const heroRef = useRef<HTMLDivElement | null>(null);
   const [scrollY, setScrollY] = useState<number>(0);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setIsVisible(true);
   }, []);
 
   useEffect(() => {
@@ -93,7 +98,6 @@ export default function ZenstrinLandingPage() {
           box-sizing: border-box;
         }
 
-
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         body {
@@ -111,9 +115,9 @@ export default function ZenstrinLandingPage() {
         }
         
         .container {
-          max-width: 1400px;
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 0 40px;
+          padding: 0 60px;
         }
         
         header {
@@ -261,7 +265,7 @@ export default function ZenstrinLandingPage() {
         .mobile-menu a {
           display: block;
           padding: 16px 0;
-          color: #1a1a1a;
+          color: #f7961c;
           text-decoration: none;
           font-size: 18px;
           font-weight: 500;
@@ -270,7 +274,7 @@ export default function ZenstrinLandingPage() {
         }
 
         .mobile-menu a:hover {
-          color: #f7961c;
+          color: white;
         }
 
         .mobile-menu .nav-cta {
@@ -285,6 +289,39 @@ export default function ZenstrinLandingPage() {
           align-items: center;
           background: #0a0a0f;
           overflow: hidden;
+        }
+
+        .hero::before,
+        .hero::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          width: 2px;
+          height: 100%;
+          background: linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent);
+          animation: scanLine 3s ease-in-out infinite;
+          z-index: 5;
+        }
+
+        .hero::before {
+          left: 80px;
+          animation-delay: 0s;
+        }
+
+        .hero::after {
+          right: 80px;
+          animation-delay: 1.5s;
+        }
+
+        @keyframes scanLine {
+          0%, 100% {
+            opacity: 0;
+            transform: translateY(-50%);
+          }
+          50% {
+            opacity: 1;
+            transform: translateY(150%);
+          }
         }
         
         .code-background {
@@ -305,6 +342,24 @@ export default function ZenstrinLandingPage() {
           animation: scrollCode 60s linear infinite;
           z-index: 2;
         }
+
+        .code-background::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 100%;
+          background: 
+            linear-gradient(90deg, 
+              rgba(247, 150, 28, 0.05) 0%, 
+              transparent 2%, 
+              transparent 98%, 
+              rgba(247, 150, 28, 0.05) 100%
+            );
+          pointer-events: none;
+          z-index: 3;
+        }
         
         @keyframes scrollCode {
           0% { transform: translateY(0); }
@@ -313,7 +368,7 @@ export default function ZenstrinLandingPage() {
         
         .code-line {
           opacity: 0;
-          animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite;
+          animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite, glitch 5s ease-in-out infinite;
           transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
         }
         
@@ -325,11 +380,57 @@ export default function ZenstrinLandingPage() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.6; }
         }
+
+        @keyframes glitch {
+          0%, 90%, 100% { 
+            transform: translateX(0);
+            filter: blur(0);
+          }
+          92% { 
+            transform: translateX(-2px);
+            filter: blur(0.5px);
+          }
+          94% { 
+            transform: translateX(2px);
+            filter: blur(0);
+          }
+          96% { 
+            transform: translateX(-1px);
+          }
+        }
         
         .hero-content {
           position: relative;
           z-index: 10;
           max-width: 1000px;
+          opacity: ${isVisible ? 1 : 0};
+          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .hero-content::before,
+        .hero-content::after {
+          content: '';
+          position: absolute;
+          width: 1px;
+          height: 60%;
+          background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+          top: 20%;
+        }
+
+        .hero-content::before {
+          left: -40px;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        .hero-content::after {
+          right: -40px;
+          animation: pulse 2s ease-in-out infinite 1s;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
         }
         
         .hero-tag {
@@ -344,6 +445,12 @@ export default function ZenstrinLandingPage() {
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 40px;
+          animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
         }
         
         h1 {
@@ -352,11 +459,34 @@ export default function ZenstrinLandingPage() {
           color: #ffffff;
           margin-bottom: 20px;
           line-height: 1.1;
+          opacity: ${isVisible ? 1 : 0};
+          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
         }
         
         h1 .highlight {
           color: #f7961c;
           display: block;
+          position: relative;
+          overflow: hidden;
+        }
+
+        h1 .highlight::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: #f7961c;
+          transform: scaleX(0);
+          transform-origin: right;
+          transition: transform 0.5s ease;
+        }
+
+        h1:hover .highlight::after {
+          transform: scaleX(1);
+          transform-origin: left;
         }
         
         .hero-subtitle {
@@ -364,12 +494,18 @@ export default function ZenstrinLandingPage() {
           color: #a0a0a0;
           margin-bottom: 50px;
           font-weight: 400;
+          opacity: ${isVisible ? 1 : 0};
+          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transition: opacity 1s ease 0.4s, transform 1s ease 0.4s;
         }
         
         .hero-buttons {
           display: flex;
           gap: 20px;
           flex-wrap: wrap;
+          opacity: ${isVisible ? 1 : 0};
+          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transition: opacity 1s ease 0.6s, transform 1s ease 0.6s;
         }
         
         .btn-primary {
@@ -384,6 +520,23 @@ export default function ZenstrinLandingPage() {
           transition: all 0.3s ease;
           border: 2px solid #ffffff;
           cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn-primary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+          left: 100%;
         }
         
         .btn-primary:hover {
@@ -391,6 +544,7 @@ export default function ZenstrinLandingPage() {
           border-color: #f7961c;
           color: #ffffff;
           transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(247, 150, 28, 0.3);
         }
         
         .btn-secondary {
@@ -405,11 +559,29 @@ export default function ZenstrinLandingPage() {
           transition: all 0.3s ease;
           border: 2px solid rgba(255, 255, 255, 0.3);
           cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn-secondary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+          transition: left 0.5s;
+        }
+
+        .btn-secondary:hover::before {
+          left: 100%;
         }
         
         .btn-secondary:hover {
           border-color: #f7961c;
           color: #f7961c;
+          transform: translateY(-2px);
         }
         
         .white-section {
@@ -459,6 +631,21 @@ export default function ZenstrinLandingPage() {
           border-radius: 12px;
           transition: all 0.3s ease;
           border: 2px solid transparent;
+          opacity: 0;
+          transform: translateY(30px);
+          animation: fadeUp 0.6s ease forwards;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .feature-card:hover {
@@ -478,6 +665,11 @@ export default function ZenstrinLandingPage() {
           font-size: 28px;
           margin-bottom: 25px;
           color: #ffffff;
+          transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+          transform: scale(1.1) rotate(5deg);
         }
         
         .feature-title {
@@ -521,7 +713,14 @@ export default function ZenstrinLandingPage() {
         
         .stat {
           text-align: center;
+          opacity: 0;
+          transform: translateY(30px);
+          animation: fadeUp 0.6s ease forwards;
         }
+
+        .stat:nth-child(1) { animation-delay: 0.1s; }
+        .stat:nth-child(2) { animation-delay: 0.2s; }
+        .stat:nth-child(3) { animation-delay: 0.3s; }
         
         .stat-number {
           font-size: 64px;
@@ -529,6 +728,11 @@ export default function ZenstrinLandingPage() {
           color: #ffffff;
           display: block;
           margin-bottom: 10px;
+          transition: transform 0.3s ease;
+        }
+
+        .stat:hover .stat-number {
+          transform: scale(1.1);
         }
         
         .stat-label {
@@ -578,6 +782,22 @@ export default function ZenstrinLandingPage() {
           text-decoration: none;
           font-size: 14px;
           transition: color 0.3s ease;
+          position: relative;
+        }
+
+        .footer-links a::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          width: 0;
+          height: 1px;
+          background: #f7961c;
+          transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover::after {
+          width: 100%;
         }
         
         .footer-links a:hover {
@@ -591,6 +811,18 @@ export default function ZenstrinLandingPage() {
         }
         
         @media (max-width: 768px) {
+          .container {
+            padding: 0 30px;
+          }
+
+          .hero::before {
+            left: 20px;
+          }
+
+          .hero::after {
+            right: 20px;
+          }
+
           h1 {
             font-size: 48px;
           }
@@ -607,16 +839,42 @@ export default function ZenstrinLandingPage() {
             display: block;
           }
           
-          .container {
-            padding: 0 20px;
-          }
-          
           .feature-grid {
             grid-template-columns: 1fr;
           }
           
           .stats {
             gap: 40px;
+          }
+
+          .footer-content {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+
+          .footer-links {
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .container {
+            padding: 0 20px;
+          }
+
+          h1 {
+            font-size: 36px;
+          }
+
+          .hero-buttons {
+            flex-direction: column;
+          }
+
+          .btn-primary, .btn-secondary {
+            width: 100%;
+            text-align: center;
           }
         }
       `}</style>
@@ -691,7 +949,7 @@ export default function ZenstrinLandingPage() {
             <div className="section-tag">Zenstrin Platform</div>
             <h2 className="section-title">Enterprise property management solution</h2>
             <p className="section-description">
-              Streamline operations across your entire portfolio with intelligent automation. 
+              Streamline operations across your entire portfolio with intelligent automation.
               Reduce administrative overhead by 30% while improving tenant satisfaction and compliance tracking.
             </p>
           </div>
