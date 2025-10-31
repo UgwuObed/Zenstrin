@@ -1,93 +1,137 @@
-import React, { useEffect, useRef, useState } from 'react';
+"use client"
+
+import type React from "react"
+import { useEffect, useRef, useState } from "react"
 
 export default function ZenstrinLandingPage() {
-  const codeBackgroundRef = useRef<HTMLDivElement | null>(null);
-  const heroRef = useRef<HTMLDivElement | null>(null);
-  const [scrollY, setScrollY] = useState<number>(0);
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const codeBackgroundRef = useRef<HTMLDivElement | null>(null)
+  const heroRef = useRef<HTMLDivElement | null>(null)
+  const [scrollY, setScrollY] = useState<number>(0)
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
+  const [isVisible, setIsVisible] = useState<boolean>(false)
+  const [stats, setStats] = useState({ items: 0, providers: 0, success: 0 })
+  const statsRef = useRef<HTMLDivElement | null>(null)
+  const [statsVisible, setStatsVisible] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   useEffect(() => {
-    setIsVisible(true);
-  }, []);
+    setIsVisible(true)
+  }, [])
 
   useEffect(() => {
-    const codeBackground = codeBackgroundRef.current;
-    if (!codeBackground) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !statsVisible) {
+          setStatsVisible(true)
+          animateCounter()
+        }
+      },
+      { threshold: 0.3 },
+    )
 
-    const characters = '+-=/*<>[]{}()#@$%&|\\';
-    const charsPerLine = 200;
-    const lines = 100;
+    if (statsRef.current) {
+      observer.observe(statsRef.current)
+    }
 
-    let codeHTML = '';
+    return () => observer.disconnect()
+  }, [statsVisible])
+
+  const animateCounter = () => {
+    let itemsCount = 0
+    let providersCount = 0
+    let successCount = 0
+    const interval = setInterval(() => {
+      if (itemsCount < 500) itemsCount += Math.random() * 50
+      if (providersCount < 200) providersCount += Math.random() * 25
+      if (successCount < 98) successCount += Math.random() * 12
+
+      setStats({
+        items: Math.min(Math.floor(itemsCount), 500),
+        providers: Math.min(Math.floor(providersCount), 200),
+        success: Math.min(Math.floor(successCount), 98),
+      })
+
+      if (itemsCount >= 500 && providersCount >= 200 && successCount >= 98) {
+        clearInterval(interval)
+      }
+    }, 30)
+  }
+
+  useEffect(() => {
+    const codeBackground = codeBackgroundRef.current
+    if (!codeBackground) return
+
+    const characters = "+-=/*<>[]{}()#@$%&|\\"
+    const charsPerLine = 200
+    const lines = 100
+
+    let codeHTML = ""
     for (let i = 0; i < lines; i++) {
-      let line = '';
+      let line = ""
       for (let j = 0; j < charsPerLine; j++) {
         if (Math.random() > 0.7) {
-          line += characters[Math.floor(Math.random() * characters.length)];
+          line += characters[Math.floor(Math.random() * characters.length)]
         } else {
-          line += ' ';
+          line += " "
         }
       }
-      const delay = i * 0.02;
-      const duration = 2 + Math.random() * 2;
-      codeHTML += `<div class="code-line" style="animation-delay: ${delay}s; animation-duration: ${duration}s">${line}</div>`;
+      const delay = i * 0.02
+      const duration = 2 + Math.random() * 2
+      codeHTML += `<div class="code-line" style="animation-delay: ${delay}s; animation-duration: ${duration}s">${line}</div>`
     }
-    codeBackground.innerHTML = codeHTML;
-  }, []);
+    codeBackground.innerHTML = codeHTML
+  }, [])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return;
-    
-    const rect = heroRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    if (!heroRef.current) return
 
-    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>('.code-line');
+    const rect = heroRef.current.getBoundingClientRect()
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
     codeLines.forEach((line) => {
-      const lineRect = line.getBoundingClientRect();
-      const lineY = lineRect.top - rect.top + lineRect.height / 2;
-      const lineX = lineRect.left - rect.left + lineRect.width / 2;
+      const lineRect = line.getBoundingClientRect()
+      const lineY = lineRect.top - rect.top + lineRect.height / 2
+      const lineX = lineRect.left - rect.left + lineRect.width / 2
 
-      const distance = Math.hypot(lineX - mouseX, lineY - mouseY);
+      const distance = Math.hypot(lineX - mouseX, lineY - mouseY)
 
       if (distance < 150) {
-        const intensity = (150 - distance) / 150;
-        const dx = lineX - mouseX;
-        const dy = lineY - mouseY;
-        const angle = Math.atan2(dy, dx);
-        const pushAmount = intensity * intensity * 20;
-        const pushX = Math.cos(angle) * pushAmount;
-        const pushY = Math.sin(angle) * pushAmount;
-        const glowIntensity = intensity * 0.8;
-
-        (line as HTMLElement).style.transform = `translate(${pushX}px, ${pushY}px) scale(${1 + intensity * 0.12})`;
-        (line as HTMLElement).style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`;
-        (line as HTMLElement).style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`;
+        const intensity = (150 - distance) / 150
+        const dx = lineX - mouseX
+        const dy = lineY - mouseY
+        const angle = Math.atan2(dy, dx)
+        const pushAmount = intensity * intensity * 20
+        const pushX = Math.cos(angle) * pushAmount
+        const pushY = Math.sin(angle) * pushAmount
+        const glowIntensity = intensity * 0.8
+        ;(line as HTMLElement).style.transform = `translate(${pushX}px, ${pushY}px) scale(${1 + intensity * 0.12})`
+        ;(line as HTMLElement).style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`
+        ;(line as HTMLElement).style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`
       } else {
-        (line as HTMLElement).style.transform = 'translate(0, 0) scale(1)';
-        (line as HTMLElement).style.textShadow = 'none';
-        (line as HTMLElement).style.color = 'rgba(100, 150, 200, 0.25)';
+        ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
+        ;(line as HTMLElement).style.textShadow = "none"
+        ;(line as HTMLElement).style.color = "rgba(100, 150, 200, 0.25)"
       }
-    });
-  };
+    })
+  }
 
   const handleMouseLeave = () => {
-    if (!heroRef.current) return;
-    
-    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>('.code-line');
-    codeLines.forEach(line => {
-      (line as HTMLElement).style.transform = 'translate(0, 0) scale(1)';
-      (line as HTMLElement).style.textShadow = 'none';
-      (line as HTMLElement).style.color = 'rgba(100, 150, 200, 0.25)';
-    });
-  };
+    if (!heroRef.current) return
+
+    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
+    codeLines.forEach((line) => {
+      ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
+      ;(line as HTMLElement).style.textShadow = "none"
+      ;(line as HTMLElement).style.color = "rgba(100, 150, 200, 0.25)"
+    })
+  }
 
   return (
     <div className="landing-page">
@@ -152,6 +196,11 @@ export default function ZenstrinLandingPage() {
         .logo img {
           height: 50px;
           width: auto;
+          transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+          transform: scale(1.05);
         }
         
         .nav-links {
@@ -166,7 +215,7 @@ export default function ZenstrinLandingPage() {
           text-decoration: none;
           font-size: 15px;
           font-weight: 500;
-          transition: color 0.3s ease;
+          transition: all 0.3s ease;
           text-transform: uppercase;
           letter-spacing: 0.5px;
           position: relative;
@@ -213,6 +262,7 @@ export default function ZenstrinLandingPage() {
           background: #f7961c;
           border-color: #f7961c;
           transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(247, 150, 28, 0.25);
         }
 
         .mobile-menu-btn {
@@ -222,6 +272,11 @@ export default function ZenstrinLandingPage() {
           cursor: pointer;
           padding: 8px;
           z-index: 1001;
+          transition: transform 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+          transform: scale(1.1);
         }
 
         .mobile-menu-btn svg {
@@ -270,11 +325,12 @@ export default function ZenstrinLandingPage() {
           font-size: 18px;
           font-weight: 500;
           border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-          transition: color 0.3s ease;
+          transition: all 0.3s ease;
         }
 
         .mobile-menu a:hover {
-          color: white;
+          color: #1a1a1a;
+          padding-left: 8px;
         }
 
         .mobile-menu .nav-cta {
@@ -341,6 +397,8 @@ export default function ZenstrinLandingPage() {
           flex-direction: column;
           animation: scrollCode 60s linear infinite;
           z-index: 2;
+          transform: translateY(${scrollY * 0.15}px);
+          transition: transform 0.1s ease-out;
         }
 
         .code-background::before {
@@ -404,7 +462,7 @@ export default function ZenstrinLandingPage() {
           z-index: 10;
           max-width: 1000px;
           opacity: ${isVisible ? 1 : 0};
-          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
           transition: opacity 1s ease, transform 1s ease;
         }
 
@@ -460,7 +518,7 @@ export default function ZenstrinLandingPage() {
           margin-bottom: 20px;
           line-height: 1.1;
           opacity: ${isVisible ? 1 : 0};
-          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
           transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
         }
         
@@ -495,7 +553,7 @@ export default function ZenstrinLandingPage() {
           margin-bottom: 50px;
           font-weight: 400;
           opacity: ${isVisible ? 1 : 0};
-          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
           transition: opacity 1s ease 0.4s, transform 1s ease 0.4s;
         }
         
@@ -504,7 +562,7 @@ export default function ZenstrinLandingPage() {
           gap: 20px;
           flex-wrap: wrap;
           opacity: ${isVisible ? 1 : 0};
-          transform: ${isVisible ? 'translateY(0)' : 'translateY(30px)'};
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
           transition: opacity 1s ease 0.6s, transform 1s ease 0.6s;
         }
         
@@ -543,8 +601,8 @@ export default function ZenstrinLandingPage() {
           background: #f7961c;
           border-color: #f7961c;
           color: #ffffff;
-          transform: translateY(-2px);
-          box-shadow: 0 10px 25px rgba(247, 150, 28, 0.3);
+          transform: translateY(-3px);
+          box-shadow: 0 15px 40px rgba(247, 150, 28, 0.4);
         }
         
         .btn-secondary {
@@ -581,7 +639,8 @@ export default function ZenstrinLandingPage() {
         .btn-secondary:hover {
           border-color: #f7961c;
           color: #f7961c;
-          transform: translateY(-2px);
+          transform: translateY(-3px);
+          box-shadow: 0 15px 40px rgba(247, 150, 28, 0.2);
         }
         
         .white-section {
@@ -593,6 +652,20 @@ export default function ZenstrinLandingPage() {
           text-align: center;
           max-width: 800px;
           margin: 0 auto 80px;
+          animation: fadeInUp 0.8s ease forwards;
+          opacity: 0;
+          animation-delay: 0.2s;
+        }
+
+        @keyframes fadeInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
         }
         
         .section-tag {
@@ -602,6 +675,9 @@ export default function ZenstrinLandingPage() {
           text-transform: uppercase;
           letter-spacing: 1.5px;
           margin-bottom: 20px;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.2s;
         }
         
         .section-title {
@@ -610,12 +686,29 @@ export default function ZenstrinLandingPage() {
           color: #1a1a1a;
           margin-bottom: 20px;
           line-height: 1.2;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.3s;
+        }
+
+        @keyframes slideInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          from {
+            opacity: 0;
+            transform: translateY(15px);
+          }
         }
         
         .section-description {
           font-size: 20px;
           color: #666;
           line-height: 1.6;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.4s;
         }
         
         .feature-grid {
@@ -629,11 +722,28 @@ export default function ZenstrinLandingPage() {
           padding: 40px;
           background: #fafafa;
           border-radius: 12px;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
           border: 2px solid transparent;
           opacity: 0;
           transform: translateY(30px);
           animation: fadeUp 0.6s ease forwards;
+          position: relative;
+        }
+
+        .feature-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #f7961c, transparent);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+          opacity: 1;
         }
 
         .feature-card:nth-child(1) { animation-delay: 0.1s; }
@@ -649,9 +759,9 @@ export default function ZenstrinLandingPage() {
         }
         
         .feature-card:hover {
-          transform: translateY(-5px);
+          transform: translateY(-12px);
           border-color: #f7961c;
-          box-shadow: 0 10px 30px rgba(247, 150, 28, 0.1);
+          box-shadow: 0 20px 50px rgba(247, 150, 28, 0.15);
         }
         
         .feature-icon {
@@ -665,11 +775,12 @@ export default function ZenstrinLandingPage() {
           font-size: 28px;
           margin-bottom: 25px;
           color: #ffffff;
-          transition: transform 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
         .feature-card:hover .feature-icon {
-          transform: scale(1.1) rotate(5deg);
+          transform: scale(1.15) rotate(-5deg);
+          box-shadow: 0 12px 30px rgba(247, 150, 28, 0.3);
         }
         
         .feature-title {
@@ -677,30 +788,53 @@ export default function ZenstrinLandingPage() {
           font-weight: 700;
           color: #1a1a1a;
           margin-bottom: 15px;
+          transition: color 0.3s ease;
+        }
+
+        .feature-card:hover .feature-title {
+          color: #f7961c;
         }
         
         .feature-text {
           font-size: 16px;
           color: #666;
           line-height: 1.6;
+          transition: color 0.3s ease;
         }
         
         .team-section {
           background: #f7961c;
           padding: 120px 0;
           color: #ffffff;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .team-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1), transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(0,0,0,0.1), transparent 50%);
+          pointer-events: none;
         }
         
         .team-section .section-tag {
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(255, 255, 255, 0.9);
+          animation-delay: 0.1s;
         }
         
         .team-section .section-title {
           color: #ffffff;
+          animation-delay: 0.15s;
         }
         
         .team-section .section-description {
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.95);
+          animation-delay: 0.2s;
         }
         
         .stats {
@@ -709,6 +843,8 @@ export default function ZenstrinLandingPage() {
           gap: 80px;
           flex-wrap: wrap;
           margin-top: 60px;
+          position: relative;
+          z-index: 1;
         }
         
         .stat {
@@ -716,11 +852,16 @@ export default function ZenstrinLandingPage() {
           opacity: 0;
           transform: translateY(30px);
           animation: fadeUp 0.6s ease forwards;
+          transition: transform 0.3s ease;
         }
 
         .stat:nth-child(1) { animation-delay: 0.1s; }
         .stat:nth-child(2) { animation-delay: 0.2s; }
         .stat:nth-child(3) { animation-delay: 0.3s; }
+
+        .stat:hover {
+          transform: translateY(-8px);
+        }
         
         .stat-number {
           font-size: 64px;
@@ -728,17 +869,23 @@ export default function ZenstrinLandingPage() {
           color: #ffffff;
           display: block;
           margin-bottom: 10px;
-          transition: transform 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
         .stat:hover .stat-number {
-          transform: scale(1.1);
+          transform: scale(1.15);
+          text-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
         .stat-label {
           font-size: 16px;
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.95);
           font-weight: 500;
+          transition: opacity 0.3s ease;
+        }
+
+        .stat:hover .stat-label {
+          opacity: 0.7;
         }
         
         .cta-section {
@@ -746,22 +893,69 @@ export default function ZenstrinLandingPage() {
           padding: 120px 0;
           text-align: center;
           color: #ffffff;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cta-section::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          right: -50%;
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(247, 150, 28, 0.1), transparent);
+          border-radius: 50%;
+          animation: float 8s ease-in-out infinite;
+        }
+
+        .cta-section::after {
+          content: '';
+          position: absolute;
+          bottom: -50%;
+          left: -50%;
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(247, 150, 28, 0.05), transparent);
+          border-radius: 50%;
+          animation: float 10s ease-in-out infinite 2s;
         }
         
         .cta-section .section-title {
           color: #ffffff;
           margin-bottom: 30px;
+          position: relative;
+          z-index: 1;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.1s;
         }
         
         .cta-section .section-description {
           color: #a0a0a0;
           margin-bottom: 50px;
+          position: relative;
+          z-index: 1;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.2s;
+        }
+
+        .cta-section .btn-primary {
+          position: relative;
+          z-index: 1;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.3s;
         }
         
         footer {
           background: #ffffff;
           padding: 60px 0 40px;
           border-top: 1px solid #e0e0e0;
+          animation: slideInUp 0.6s ease forwards;
+          opacity: 0;
+          animation-delay: 0.1s;
         }
         
         .footer-content {
@@ -781,7 +975,7 @@ export default function ZenstrinLandingPage() {
           color: #666;
           text-decoration: none;
           font-size: 14px;
-          transition: color 0.3s ease;
+          transition: all 0.3s ease;
           position: relative;
         }
 
@@ -802,6 +996,7 @@ export default function ZenstrinLandingPage() {
         
         .footer-links a:hover {
           color: #f7961c;
+          transform: translateY(-2px);
         }
         
         .copyright {
@@ -879,7 +1074,7 @@ export default function ZenstrinLandingPage() {
         }
       `}</style>
 
-      <header className={scrollY > 50 ? 'scrolled' : ''}>
+      <header className={scrollY > 50 ? "scrolled" : ""}>
         <div className="container">
           <nav>
             <div className="logo">
@@ -889,16 +1084,22 @@ export default function ZenstrinLandingPage() {
               />
             </div>
             <ul className="nav-links">
-              <li><a href="#zenstrin">Zenstrin</a></li>
-              <li><a href="#zenfinder">ZenFinder</a></li>
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="/contact" className="nav-cta">Contact Us ↗</a></li>
+              <li>
+                <a href="#zenstrin">Zenstrin</a>
+              </li>
+              <li>
+                <a href="#zenfinder">ZenFinder</a>
+              </li>
+              <li>
+                <a href="/blog">Blog</a>
+              </li>
+              <li>
+                <a href="/contact" className="nav-cta">
+                  Contact Us ↗
+                </a>
+              </li>
             </ul>
-            <button 
-              className="mobile-menu-btn" 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
+            <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 18L18 6M6 6l12 12" />
@@ -913,19 +1114,22 @@ export default function ZenstrinLandingPage() {
         </div>
       </header>
 
-      <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-        <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>Zenstrin</a>
-        <a href="#zenfinder" onClick={() => setIsMenuOpen(false)}>ZenFinder</a>
-        <a href="/blog" onClick={() => setIsMenuOpen(false)}>Blog</a>
-        <a href="/contact" className="nav-cta">Contact Us ↗</a>
+      <div className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
+        <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>
+          Zenstrin
+        </a>
+        <a href="#zenfinder" onClick={() => setIsMenuOpen(false)}>
+          ZenFinder
+        </a>
+        <a href="/blog" onClick={() => setIsMenuOpen(false)}>
+          Blog
+        </a>
+        <a href="/contact" className="nav-cta">
+          Contact Us ↗
+        </a>
       </div>
 
-      <section 
-        className="hero" 
-        ref={heroRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
+      <section className="hero" ref={heroRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
         <div className="code-background" ref={codeBackgroundRef}></div>
         <div className="container">
           <div className="hero-content">
@@ -936,102 +1140,146 @@ export default function ZenstrinLandingPage() {
             </h1>
             <p className="hero-subtitle">Voice-first AI marketplace</p>
             <div className="hero-buttons">
-              <a href="#" className="btn-primary">REQUEST DEMO ↗</a>
-              <a href="#" className="btn-secondary">LEARN MORE ↗</a>
+              <a href="#" className="btn-primary">
+                REQUEST DEMO ↗
+              </a>
+              <a href="#" className="btn-secondary">
+                LEARN MORE ↗
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-     <section id="zenstrin" className="white-section">
+      <section id="zenstrin" className="white-section">
         <div className="container">
           <div className="section-header">
             <div className="section-tag">Zenstrin Platform</div>
             <h2 className="section-title">Enterprise property management solution</h2>
             <p className="section-description">
-              Streamline operations across your entire portfolio with intelligent automation.
-              Reduce administrative overhead by 30% while improving tenant satisfaction and compliance tracking.
+              Streamline operations across your entire portfolio with intelligent automation. Reduce administrative
+              overhead by 30% while improving tenant satisfaction and compliance tracking.
             </p>
           </div>
-          
+
           <div className="feature-grid">
             <div className="feature-card">
               <div className="feature-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
               </div>
               <h3 className="feature-title">Lease Administration</h3>
               <p className="feature-text">
-                Centralized tenant management with automated renewals, digital signatures, and rent collection tracking. Real-time visibility across all properties.
+                Centralized tenant management with automated renewals, digital signatures, and rent collection tracking.
+                Real-time visibility across all properties.
               </p>
             </div>
-            
+
             <div className="feature-card">
               <div className="feature-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
                 </svg>
               </div>
               <h3 className="feature-title">Work Order Management</h3>
               <p className="feature-text">
-                End-to-end maintenance workflow from request submission to completion. Contractor assignment, progress tracking, and automated status updates.
+                End-to-end maintenance workflow from request submission to completion. Contractor assignment, progress
+                tracking, and automated status updates.
               </p>
             </div>
-            
+
             <div className="feature-card">
               <div className="feature-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="12" y1="1" x2="12" y2="23"></line>
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
               </div>
               <h3 className="feature-title">Financial Integration</h3>
               <p className="feature-text">
-                Seamless synchronization with Xero, QuickBooks, and major accounting platforms. Automated reconciliation, expense tracking, and financial reporting.
+                Seamless synchronization with Xero, QuickBooks, and major accounting platforms. Automated
+                reconciliation, expense tracking, and financial reporting.
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
               </div>
               <h3 className="feature-title">Regulatory Compliance</h3>
               <p className="feature-text">
-                Automated compliance monitoring with scheduled inspections, safety certifications, and regulatory deadline tracking. Stay audit-ready at all times.
+                Automated compliance monitoring with scheduled inspections, safety certifications, and regulatory
+                deadline tracking. Stay audit-ready at all times.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="zenfinder" className="team-section">
+      <section id="zenfinder" className="team-section" ref={statsRef}>
         <div className="container">
           <div className="section-header">
             <div className="section-tag">ZENFINDER</div>
             <h2 className="section-title">Voice-first AI marketplace</h2>
             <p className="section-description">
-              Find a service provider in seconds — just by speaking. An AI-powered, voice-first 
-              marketplace that instantly connects users with real service providers.
+              Find a service provider in seconds — just by speaking. An AI-powered, voice-first marketplace that
+              instantly connects users with real service providers.
             </p>
           </div>
-          
+
           <div className="stats">
             <div className="stat">
-              <span className="stat-number">⚡</span>
-              <span className="stat-label">Instant Connections</span>
+              <span className="stat-number">{stats.items}+</span>
+              <span className="stat-label">Active Listings</span>
             </div>
             <div className="stat">
-              <span className="stat-number">🎤</span>
-              <span className="stat-label">Voice-Driven</span>
+              <span className="stat-number">{stats.providers}+</span>
+              <span className="stat-label">Service Providers</span>
             </div>
             <div className="stat">
-              <span className="stat-number">🤝</span>
-              <span className="stat-label">Human Touch</span>
+              <span className="stat-number">{stats.success}%</span>
+              <span className="stat-label">Success Rate</span>
             </div>
           </div>
         </div>
@@ -1041,10 +1289,12 @@ export default function ZenstrinLandingPage() {
         <div className="container">
           <h2 className="section-title">The future of simplicity is here</h2>
           <p className="section-description">
-            Whether you're managing properties or finding a reliable professional, Zenstrin 
-            Technologies bridges the gap between AI automation and human interaction.
+            Whether you're managing properties or finding a reliable professional, Zenstrin Technologies bridges the gap
+            between AI automation and human interaction.
           </p>
-          <a href="#contact" className="btn-primary">Get Started Today</a>
+          <a href="#contact" className="btn-primary">
+            Get Started Today
+          </a>
         </div>
       </section>
 
@@ -1055,7 +1305,7 @@ export default function ZenstrinLandingPage() {
               <img
                 src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png"
                 alt="Zenstrin Logo"
-                style={{ height: '40px' }}
+                style={{ height: "40px" }}
               />
             </div>
             <div className="footer-links">
@@ -1070,5 +1320,5 @@ export default function ZenstrinLandingPage() {
         </div>
       </footer>
     </div>
-  );
+  )
 }
