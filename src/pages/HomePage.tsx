@@ -67,14 +67,14 @@ export default function ZenstrinLandingPage() {
     if (!codeBackground) return
 
     const characters = "+-=/*<>[]{}()#@$%&|\\"
-    const charsPerLine = 200
-    const lines = 100
+    const charsPerLine = 250
+    const lines = 150
 
     let codeHTML = ""
     for (let i = 0; i < lines; i++) {
       let line = ""
       for (let j = 0; j < charsPerLine; j++) {
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.5) {
           line += characters[Math.floor(Math.random() * characters.length)]
         } else {
           line += " "
@@ -424,11 +424,12 @@ export default function ZenstrinLandingPage() {
           100% { transform: translateY(-20%); }
         }
         
-        .code-line {
-          opacity: 0;
-          animation: fadeIn 2s ease-in-out forwards, shimmer 3s ease-in-out infinite, glitch 5s ease-in-out infinite;
-          transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
-        }
+    .code-line {
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in-out forwards, shimmer 2.5s ease-in-out infinite, glitch 5s ease-in-out infinite;
+      transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
+      text-shadow: 0 0 1px rgba(247, 150, 28, 0.3); 
+    }
         
         @keyframes fadeIn {
           to { opacity: 1; }
