@@ -6,6 +6,13 @@ import { useEffect, useRef, useState } from "react"
 export default function ZenstrinLandingPage() {
   const codeBackgroundRef = useRef<HTMLDivElement | null>(null)
   const heroRef = useRef<HTMLDivElement | null>(null)
+  const codeLinesRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
+  const linePositionsRef = useRef<Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }>>(
+    [],
+  )
+  const mouseRef = useRef<{ x: number; y: number } | null>(null)
+  const rafRef = useRef<number | null>(null)
+  const needsUpdateRef = useRef(false)
   const [scrollY, setScrollY] = useState<number>(0)
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const [isVisible, setIsVisible] = useState<boolean>(false)
@@ -13,10 +20,38 @@ export default function ZenstrinLandingPage() {
   const statsRef = useRef<HTMLDivElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
 
+  const [isInView, setIsInView] = useState(true)
+
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+        const codeBackground = codeBackgroundRef.current
+        if (codeBackground) {
+          if (entry.isIntersecting) {
+            codeBackground.style.animationPlayState = 'running'
+          } else {
+            codeBackground.style.animationPlayState = 'paused'
+          }
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '100px'
+      }
+    )
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current)
+    }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      observer.disconnect()
+    }
   }, [])
 
   useEffect(() => {
@@ -66,9 +101,10 @@ export default function ZenstrinLandingPage() {
     const codeBackground = codeBackgroundRef.current
     if (!codeBackground) return
 
+
     const characters = "+-=/*<>[]{}()#@$%&|\\"
-    const charsPerLine = 250
-    const lines = 150
+    const charsPerLine = 180
+    const lines = 90
 
     let codeHTML = ""
     for (let i = 0; i < lines; i++) {
@@ -82,56 +118,158 @@ export default function ZenstrinLandingPage() {
       }
       const delay = i * 0.02
       const duration = 2 + Math.random() * 2
+    
       codeHTML += `<div class="code-line" style="animation-delay: ${delay}s; animation-duration: ${duration}s">${line}</div>`
     }
     codeBackground.innerHTML = codeHTML
+
+    requestAnimationFrame(() => {
+      if (!codeBackground) return
+      const nodes = codeBackground.querySelectorAll<HTMLDivElement>(".code-line")
+      codeLinesRef.current = nodes
+      const rect = codeBackground.getBoundingClientRect()
+      const positions: Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }> = []
+      nodes.forEach((node) => {
+        const r = node.getBoundingClientRect()
+        const x = r.left - rect.left
+        const y = r.top - rect.top
+        const w = r.width
+        const h = r.height
+        positions.push({ x, y, w, h, cx: x + w / 2, cy: y + h / 2 })
+        node.style.willChange = "transform, color, text-shadow"
+      })
+      linePositionsRef.current = positions
+    })
   }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const codeBackground = codeBackgroundRef.current
+      const nodes = codeBackground?.querySelectorAll<HTMLDivElement>(".code-line")
+      if (!codeBackground || !nodes) return
+      const rect = codeBackground.getBoundingClientRect()
+      const positions: Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }> = []
+      nodes.forEach((node) => {
+        const r = node.getBoundingClientRect()
+        const x = r.left - rect.left
+        const y = r.top - rect.top
+        const w = r.width
+        const h = r.height
+        positions.push({ x, y, w, h, cx: x + w / 2, cy: y + h / 2 })
+      })
+      codeLinesRef.current = nodes
+      linePositionsRef.current = positions
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const springConfig = {
+    tension: 180,
+    friction: 12,
+    velocity: { x: 0, y: 0 },
+    target: { x: 0, y: 0 },
+    current: { x: 0, y: 0 }
+  }
+
+  const updateTransforms = () => {
+    needsUpdateRef.current = false
+    const codeLines = codeLinesRef.current
+    const positions = linePositionsRef.current
+    const mouse = mouseRef.current
+    if (!codeLines || !positions || !mouse) return
+
+    const maxDist = 150
+    const dt = 1 / 60 
+    
+    for (let i = 0; i < codeLines.length; i++) {
+      const line = codeLines[i]
+      const pos = positions[i]
+      if (!pos) continue
+
+      const dx = pos.cx - mouse.x
+      const dy = pos.cy - mouse.y
+      const distance = Math.hypot(dx, dy)
+
+      if (distance < maxDist) {
+        const intensity = (maxDist - distance) / maxDist
+        const angle = Math.atan2(dy, dx)
+        const targetAmount = intensity * intensity * 20
+
+        springConfig.target.x = Math.cos(angle) * targetAmount
+        springConfig.target.y = Math.sin(angle) * targetAmount
+
+        const fx = (springConfig.target.x - springConfig.current.x) * springConfig.tension
+        const fy = (springConfig.target.y - springConfig.current.y) * springConfig.tension
+
+        springConfig.velocity.x += fx * dt
+        springConfig.velocity.y += fy * dt
+
+        springConfig.velocity.x *= Math.pow(1 - springConfig.friction * dt, 2)
+        springConfig.velocity.y *= Math.pow(1 - springConfig.friction * dt, 2)
+
+        springConfig.current.x += springConfig.velocity.x * dt
+        springConfig.current.y += springConfig.velocity.y * dt
+
+        const glowIntensity = intensity * 0.8
+        line.style.transform = `translate(${springConfig.current.x}px, ${springConfig.current.y}px) scale(${1 + intensity * 0.12})`
+        line.style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`
+        line.style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`
+      } else {
+        springConfig.current.x *= 0.85
+        springConfig.current.y *= 0.85
+        springConfig.velocity.x = 0
+        springConfig.velocity.y = 0
+
+        if (Math.abs(springConfig.current.x) < 0.01 && Math.abs(springConfig.current.y) < 0.01) {
+          line.style.transform = "translate(0, 0) scale(1)"
+          line.style.textShadow = "none"
+          line.style.color = "rgba(100, 150, 200, 0.25)"
+        } else {
+          line.style.transform = `translate(${springConfig.current.x}px, ${springConfig.current.y}px) scale(1)`
+        }
+      }
+    }
+  }
+
+  const scheduleUpdate = () => {
+    if (!needsUpdateRef.current && isInView) {
+      needsUpdateRef.current = true
+      rafRef.current = requestAnimationFrame(() => {
+        updateTransforms()
+      })
+    }
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!heroRef.current) return
-
     const rect = heroRef.current.getBoundingClientRect()
     const mouseX = e.clientX - rect.left
     const mouseY = e.clientY - rect.top
-
-    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
-    codeLines.forEach((line) => {
-      const lineRect = line.getBoundingClientRect()
-      const lineY = lineRect.top - rect.top + lineRect.height / 2
-      const lineX = lineRect.left - rect.left + lineRect.width / 2
-
-      const distance = Math.hypot(lineX - mouseX, lineY - mouseY)
-
-      if (distance < 150) {
-        const intensity = (150 - distance) / 150
-        const dx = lineX - mouseX
-        const dy = lineY - mouseY
-        const angle = Math.atan2(dy, dx)
-        const pushAmount = intensity * intensity * 20
-        const pushX = Math.cos(angle) * pushAmount
-        const pushY = Math.sin(angle) * pushAmount
-        const glowIntensity = intensity * 0.8
-        ;(line as HTMLElement).style.transform = `translate(${pushX}px, ${pushY}px) scale(${1 + intensity * 0.12})`
-        ;(line as HTMLElement).style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`
-        ;(line as HTMLElement).style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`
-      } else {
-        ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
-        ;(line as HTMLElement).style.textShadow = "none"
-        ;(line as HTMLElement).style.color = "rgba(100, 150, 200, 0.25)"
-      }
-    })
+    mouseRef.current = { x: mouseX, y: mouseY }
+    scheduleUpdate()
   }
 
   const handleMouseLeave = () => {
-    if (!heroRef.current) return
-
-    const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
-    codeLines.forEach((line) => {
-      ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
-      ;(line as HTMLElement).style.textShadow = "none"
-      ;(line as HTMLElement).style.color = "rgba(100, 150, 200, 0.25)"
+    mouseRef.current = null
+    const nodes = codeLinesRef.current
+    if (!nodes) return
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(() => {
+      nodes.forEach((line) => {
+        line.style.transform = "translate(0, 0) scale(1)"
+        line.style.textShadow = "none"
+        line.style.color = "rgba(100, 150, 200, 0.25)"
+      })
     })
   }
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
 
   return (
     <div className="landing-page">
@@ -421,7 +559,8 @@ export default function ZenstrinLandingPage() {
         
         @keyframes scrollCode {
           0% { transform: translateY(0); }
-          100% { transform: translateY(-20%); }
+          50% { transform: translateY(-10%); }
+          100% { transform: translateY(0); }
         }
         
     .code-line {
