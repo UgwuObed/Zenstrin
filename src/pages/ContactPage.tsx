@@ -12,9 +12,8 @@ function ContactPage() {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
     company: '',
-    interest: 'Zenstrin',
+    interest: 'ZenFinder',
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
@@ -47,8 +46,7 @@ function ContactPage() {
           email: formData.email,
           name: `${formData.firstName} ${formData.lastName}`,
           subject: `${formData.interest}${formData.company ? ' - ' + formData.company : ''}`,
-          comments: formData.message,
-          phone: formData.phone || 'Not provided'
+          comments: formData.message
         });
         
         setSubmitted(true);
@@ -58,9 +56,8 @@ function ContactPage() {
             firstName: '',
             lastName: '',
             email: '',
-            phone: '',
             company: '',
-            interest: 'Zenstrin',
+            interest: 'ZenFinder',
             message: ''
           });
         }, 3000);
@@ -121,8 +118,25 @@ function ContactPage() {
         </div>
       </section>
 
+      {/* ZenFinder CTA (primary) */}
+      <section className="px-6 py-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="rounded-2xl border border-gray-200 bg-gradient-to-r from-[#fff7ec] to-white p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div>
+              <div className="text-[#f7961c] font-semibold uppercase tracking-wider text-sm mb-2">ZenFinder</div>
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Talk to us about the voice-first marketplace</h2>
+              <p className="text-gray-700 font-light max-w-2xl">Let our team show you how ZenFinder connects users to providers in seconds and how you can launch in your market.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <a href="/blog" className="px-6 py-3 rounded-full bg-[#f7961c] hover:bg-[#e08515] text-white text-center font-medium transition-colors">Learn about ZenFinder</a>
+              <a href="#contact-form" className="px-6 py-3 rounded-full border border-[#f7961c] text-[#f7961c] hover:bg-[#fff2e3] text-center font-medium transition-colors">Contact sales</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Info Cards */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-8 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             <ContactCard
@@ -145,8 +159,8 @@ function ContactPage() {
             />
           </div>
 
-          {/* Contact Form */}
-          <div className="max-w-3xl mx-auto">
+          {/* Contact Form (secondary) */}
+          <div className="max-w-3xl mx-auto" id="contact-form">
             <div className="bg-white border border-gray-200 rounded-lg p-8 md:p-12">
               <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-gray-900">Send Us a Message</h2>
               <p className="text-gray-600 mb-8 font-light">
@@ -193,31 +207,17 @@ function ContactPage() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
-                      placeholder="john@example.com"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
-                      placeholder="+1 (555) 123-4567"
-                      disabled={isSubmitting}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f7961c] transition-colors"
+                    placeholder="john@example.com"
+                    disabled={isSubmitting}
+                  />
                 </div>
 
                 <div>

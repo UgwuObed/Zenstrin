@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, Menu, X, Calendar, User, Clock, Search, ArrowLeft } from 'lucide-react';
 
-// Blog post data moved to a separate constant for reusability
 const blogPosts = [
   {
     id: 1,

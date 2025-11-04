@@ -1,58 +1,20 @@
 "use client"
 
-import type React from "react"
 import { useEffect, useRef, useState } from "react"
 
 export default function ZenstrinLandingPage() {
   const codeBackgroundRef = useRef<HTMLDivElement | null>(null)
   const heroRef = useRef<HTMLDivElement | null>(null)
-  const codeLinesRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
-  const linePositionsRef = useRef<Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }>>(
-    [],
-  )
-  const mouseRef = useRef<{ x: number; y: number } | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const needsUpdateRef = useRef(false)
-  const [scrollY, setScrollY] = useState<number>(0)
+  const featuredCodeRef = useRef<HTMLDivElement | null>(null)
+  
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [stats, setStats] = useState({ items: 0, providers: 0, success: 0 })
   const statsRef = useRef<HTMLDivElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
+  const featuredPostTitle = "How AI voice search is reshaping marketplaces"
 
-  const [isInView, setIsInView] = useState(true)
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting)
-        const codeBackground = codeBackgroundRef.current
-        if (codeBackground) {
-          if (entry.isIntersecting) {
-            codeBackground.style.animationPlayState = 'running'
-          } else {
-            codeBackground.style.animationPlayState = 'paused'
-          }
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '100px'
-      }
-    )
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current)
-    }
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      observer.disconnect()
-    }
-  }, [])
+  
 
   useEffect(() => {
     setIsVisible(true)
@@ -101,10 +63,9 @@ export default function ZenstrinLandingPage() {
     const codeBackground = codeBackgroundRef.current
     if (!codeBackground) return
 
-
-    const characters = "+-=/*<>[]{}()#@$%&|\\"
-    const charsPerLine = 180
-    const lines = 90
+    const characters = "+-=/*<>[]{}()#@$%&|\\%%%%####@@@***+++===---:::;;;,,,111000//\\\\||"
+    const charsPerLine = 300
+    const lines = 180
 
     let codeHTML = ""
     for (let i = 0; i < lines; i++) {
@@ -116,160 +77,32 @@ export default function ZenstrinLandingPage() {
           line += " "
         }
       }
-      const delay = i * 0.02
-      const duration = 2 + Math.random() * 2
-    
-      codeHTML += `<div class="code-line" style="animation-delay: ${delay}s; animation-duration: ${duration}s">${line}</div>`
+      codeHTML += `<div class="code-line">${line}</div>`
     }
     codeBackground.innerHTML = codeHTML
-
-    requestAnimationFrame(() => {
-      if (!codeBackground) return
-      const nodes = codeBackground.querySelectorAll<HTMLDivElement>(".code-line")
-      codeLinesRef.current = nodes
-      const rect = codeBackground.getBoundingClientRect()
-      const positions: Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }> = []
-      nodes.forEach((node) => {
-        const r = node.getBoundingClientRect()
-        const x = r.left - rect.left
-        const y = r.top - rect.top
-        const w = r.width
-        const h = r.height
-        positions.push({ x, y, w, h, cx: x + w / 2, cy: y + h / 2 })
-        node.style.willChange = "transform, color, text-shadow"
-      })
-      linePositionsRef.current = positions
-    })
   }, [])
 
   useEffect(() => {
-    const handleResize = () => {
-      const codeBackground = codeBackgroundRef.current
-      const nodes = codeBackground?.querySelectorAll<HTMLDivElement>(".code-line")
-      if (!codeBackground || !nodes) return
-      const rect = codeBackground.getBoundingClientRect()
-      const positions: Array<{ x: number; y: number; w: number; h: number; cx: number; cy: number }> = []
-      nodes.forEach((node) => {
-        const r = node.getBoundingClientRect()
-        const x = r.left - rect.left
-        const y = r.top - rect.top
-        const w = r.width
-        const h = r.height
-        positions.push({ x, y, w, h, cx: x + w / 2, cy: y + h / 2 })
-      })
-      codeLinesRef.current = nodes
-      linePositionsRef.current = positions
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  const springConfig = {
-    tension: 180,
-    friction: 12,
-    velocity: { x: 0, y: 0 },
-    target: { x: 0, y: 0 },
-    current: { x: 0, y: 0 }
-  }
-
-  const updateTransforms = () => {
-    needsUpdateRef.current = false
-    const codeLines = codeLinesRef.current
-    const positions = linePositionsRef.current
-    const mouse = mouseRef.current
-    if (!codeLines || !positions || !mouse) return
-
-    const maxDist = 150
-    const dt = 1 / 60 
-    
-    for (let i = 0; i < codeLines.length; i++) {
-      const line = codeLines[i]
-      const pos = positions[i]
-      if (!pos) continue
-
-      const dx = pos.cx - mouse.x
-      const dy = pos.cy - mouse.y
-      const distance = Math.hypot(dx, dy)
-
-      if (distance < maxDist) {
-        const intensity = (maxDist - distance) / maxDist
-        const angle = Math.atan2(dy, dx)
-        const targetAmount = intensity * intensity * 20
-
-        springConfig.target.x = Math.cos(angle) * targetAmount
-        springConfig.target.y = Math.sin(angle) * targetAmount
-
-        const fx = (springConfig.target.x - springConfig.current.x) * springConfig.tension
-        const fy = (springConfig.target.y - springConfig.current.y) * springConfig.tension
-
-        springConfig.velocity.x += fx * dt
-        springConfig.velocity.y += fy * dt
-
-        springConfig.velocity.x *= Math.pow(1 - springConfig.friction * dt, 2)
-        springConfig.velocity.y *= Math.pow(1 - springConfig.friction * dt, 2)
-
-        springConfig.current.x += springConfig.velocity.x * dt
-        springConfig.current.y += springConfig.velocity.y * dt
-
-        const glowIntensity = intensity * 0.8
-        line.style.transform = `translate(${springConfig.current.x}px, ${springConfig.current.y}px) scale(${1 + intensity * 0.12})`
-        line.style.textShadow = `0 0 ${glowIntensity * 30}px rgba(247, 150, 28, ${glowIntensity})`
-        line.style.color = `rgba(100, 150, 200, ${0.25 + intensity * 0.35})`
-      } else {
-        springConfig.current.x *= 0.85
-        springConfig.current.y *= 0.85
-        springConfig.velocity.x = 0
-        springConfig.velocity.y = 0
-
-        if (Math.abs(springConfig.current.x) < 0.01 && Math.abs(springConfig.current.y) < 0.01) {
-          line.style.transform = "translate(0, 0) scale(1)"
-          line.style.textShadow = "none"
-          line.style.color = "rgba(100, 150, 200, 0.25)"
+    if (!featuredCodeRef.current) return
+    const characters = "+-=/*<>[]{}()#@$%&|\\%%%%####@@@***+++===---:::;;;,,,111000//\\\\||"
+    const charsPerLine = 300
+    const lines = 160
+    let codeHTML = ""
+    for (let i = 0; i < lines; i++) {
+      let line = ""
+      for (let j = 0; j < charsPerLine; j++) {
+        if (Math.random() > 0.5) {
+          line += characters[Math.floor(Math.random() * characters.length)]
         } else {
-          line.style.transform = `translate(${springConfig.current.x}px, ${springConfig.current.y}px) scale(1)`
+          line += " "
         }
       }
+      codeHTML += `<div class="code-line">${line}</div>`
     }
-  }
-
-  const scheduleUpdate = () => {
-    if (!needsUpdateRef.current && isInView) {
-      needsUpdateRef.current = true
-      rafRef.current = requestAnimationFrame(() => {
-        updateTransforms()
-      })
-    }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return
-    const rect = heroRef.current.getBoundingClientRect()
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
-    mouseRef.current = { x: mouseX, y: mouseY }
-    scheduleUpdate()
-  }
-
-  const handleMouseLeave = () => {
-    mouseRef.current = null
-    const nodes = codeLinesRef.current
-    if (!nodes) return
-    if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    rafRef.current = requestAnimationFrame(() => {
-      nodes.forEach((line) => {
-        line.style.transform = "translate(0, 0) scale(1)"
-        line.style.textShadow = "none"
-        line.style.color = "rgba(100, 150, 200, 0.25)"
-      })
-    })
-  }
-
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    }
+    featuredCodeRef.current.innerHTML = codeHTML
   }, [])
+
+
 
   return (
     <div className="landing-page">
@@ -307,9 +140,13 @@ export default function ZenstrinLandingPage() {
           top: 0;
           left: 0;
           right: 0;
-          padding: 20px 0;
+          padding: 12px 0;
           z-index: 1000;
           transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         header.scrolled {
@@ -332,7 +169,7 @@ export default function ZenstrinLandingPage() {
         }
         
         .logo img {
-          height: 50px;
+          height: 56px;
           width: auto;
           transition: transform 0.3s ease;
         }
@@ -343,13 +180,13 @@ export default function ZenstrinLandingPage() {
         
         .nav-links {
           display: flex;
-          gap: 40px;
+          gap: 28px;
           list-style: none;
           align-items: center;
         }
         
         .nav-links a {
-          color: #ffffff;
+          color: #f7961c;
           text-decoration: none;
           font-size: 15px;
           font-weight: 500;
@@ -375,7 +212,7 @@ export default function ZenstrinLandingPage() {
         }
         
         .nav-links a:hover {
-          color: white;
+          color: #f7961c;
         }
 
         .nav-links a:hover::after {
@@ -385,7 +222,7 @@ export default function ZenstrinLandingPage() {
         .nav-cta {
           background: #1a1a1a;
           color: #ffffff;
-          padding: 12px 24px;
+          padding: 10px 18px;
           border-radius: 6px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           transition: all 0.3s ease;
@@ -396,12 +233,6 @@ export default function ZenstrinLandingPage() {
           border-color: #f7961c;
         }
         
-        .nav-cta:hover {
-          background: #f7961c;
-          border-color: #f7961c;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(247, 150, 28, 0.25);
-        }
 
         .mobile-menu-btn {
           display: none;
@@ -420,7 +251,7 @@ export default function ZenstrinLandingPage() {
         .mobile-menu-btn svg {
           width: 24px;
           height: 24px;
-          stroke: #ffffff;
+          stroke: #1a1a1a;
         }
 
         header.scrolled .mobile-menu-btn svg {
@@ -478,7 +309,7 @@ export default function ZenstrinLandingPage() {
         
         .hero {
           position: relative;
-          min-height: 100vh;
+          min-height: 115vh;
           display: flex;
           align-items: center;
           background: #0a0a0f;
@@ -488,23 +319,7 @@ export default function ZenstrinLandingPage() {
         .hero::before,
         .hero::after {
           content: '';
-          position: absolute;
-          top: 0;
-          width: 2px;
-          height: 100%;
-          background: linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent);
-          animation: scanLine 3s ease-in-out infinite;
-          z-index: 5;
-        }
-
-        .hero::before {
-          left: 80px;
-          animation-delay: 0s;
-        }
-
-        .hero::after {
-          right: 80px;
-          animation-delay: 1.5s;
+          display: none; /* disable moving scan lines */
         }
 
         @keyframes scanLine {
@@ -525,18 +340,17 @@ export default function ZenstrinLandingPage() {
           width: 100%;
           height: 100%;
           font-family: 'Courier New', monospace;
-          font-size: 12px;
-          line-height: 1.5;
-          color: rgba(100, 150, 200, 0.25);
+          font-size: 16px;
+          line-height: 1.4;
+          color: rgba(40, 66, 92, 0.4);
           overflow: hidden;
           white-space: pre;
           pointer-events: none;
           display: flex;
           flex-direction: column;
-          animation: scrollCode 60s linear infinite;
           z-index: 2;
-          transform: translateY(${scrollY * 0.15}px);
-          transition: transform 0.1s ease-out;
+          transform: translateY(0);
+          animation: none !important;
         }
 
         .code-background::before {
@@ -548,26 +362,21 @@ export default function ZenstrinLandingPage() {
           height: 100%;
           background: 
             linear-gradient(90deg, 
-              rgba(247, 150, 28, 0.05) 0%, 
+              rgba(247, 150, 28, 0.08) 0%, 
               transparent 2%, 
               transparent 98%, 
-              rgba(247, 150, 28, 0.05) 100%
+              rgba(247, 150, 28, 0.08) 100%
             );
           pointer-events: none;
           z-index: 3;
         }
         
-        @keyframes scrollCode {
-          0% { transform: translateY(0); }
-          50% { transform: translateY(-10%); }
-          100% { transform: translateY(0); }
-        }
         
     .code-line {
-      opacity: 0;
-      animation: fadeIn 1.5s ease-in-out forwards, shimmer 2.5s ease-in-out infinite, glitch 5s ease-in-out infinite;
-      transition: transform 0.15s ease-out, text-shadow 0.15s ease-out, color 0.15s ease-out;
-      text-shadow: 0 0 1px rgba(247, 150, 28, 0.3); 
+      opacity: 1;
+      animation: none !important;
+      transition: transform 0.2s ease-out, text-shadow 0.2s ease-out, color 0.2s ease-out;
+      text-shadow: 0 0 2px rgba(247, 150, 28, 0.35);
     }
         
         @keyframes fadeIn {
@@ -575,8 +384,8 @@ export default function ZenstrinLandingPage() {
         }
         
         @keyframes shimmer {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
+          0%, 100% { opacity: 0.45; }
+          50% { opacity: 0.8; }
         }
 
         @keyframes glitch {
@@ -606,6 +415,110 @@ export default function ZenstrinLandingPage() {
           transition: opacity 1s ease, transform 1s ease;
         }
 
+        .hero-right-cta {
+          position: absolute;
+          right: 60px;
+          bottom: 60px;
+          z-index: 11;
+        }
+
+        .hero-right-cta .cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #0a0a0f;
+          background: #e0e6ff;
+          border: 1px solid rgba(255,255,255,0.25);
+          padding: 14px 20px;
+          border-radius: 10px;
+          text-decoration: none;
+          font-weight: 700;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .hero-right-cta .cta:hover {
+          transform: translateY(-2px);
+          background: #f7961c;
+          color: #ffffff;
+        }
+
+        .featured-blog-section {
+          background: #0a0a0f;
+          padding: 40px 0 120px;
+          position: relative;
+        }
+
+        .featured-blog-section .code-background {
+          z-index: 0;
+          opacity: 0.35;
+        }
+
+        .featured-blog-card {
+          margin: -40px auto 0; 
+          max-width: 960px;
+          background: rgba(9, 12, 20, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 14px;
+          padding: 28px 28px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+          position: relative;
+          z-index: 1;
+        }
+
+        .featured-blog-card .meta {
+          display: inline-flex;
+          gap: 8px;
+          align-items: center;
+          font-size: 12px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: #9fb0ff;
+        }
+
+        .featured-blog-card .title {
+          margin-top: 12px;
+          color: #e9eeff;
+          font-size: 30px;
+          line-height: 1.25;
+          font-weight: 800;
+        }
+
+        .featured-blog-card .actions {
+          margin-top: 16px;
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .featured-blog-card .actions a {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+          font-weight: 600;
+        }
+
+        .featured-blog-card .read {
+          color: #0a0a0f;
+          background: #e0e6ff;
+          border: 1px solid rgba(255,255,255,0.25);
+          padding: 10px 14px;
+          border-radius: 8px;
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .featured-blog-card .read:hover {  
+          transform: translateY(-2px);
+          background: #f7961c;
+          color: #ffffff;
+        }
+
+        .featured-blog-card .more {
+          color: #cfd8ff;
+        }
+
         .hero-content::before,
         .hero-content::after {
           content: '';
@@ -618,18 +531,13 @@ export default function ZenstrinLandingPage() {
 
         .hero-content::before {
           left: -40px;
-          animation: pulse 2s ease-in-out infinite;
         }
 
         .hero-content::after {
           right: -40px;
-          animation: pulse 2s ease-in-out infinite 1s;
         }
 
-        @keyframes pulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 1; }
-        }
+        /* pulse animation disabled */
         
         .hero-tag {
           display: inline-block;
@@ -643,13 +551,10 @@ export default function ZenstrinLandingPage() {
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 40px;
-          animation: float 3s ease-in-out infinite;
+          /* float animation disabled */
         }
 
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
+        /* float animation removed */
         
         h1 {
           font-size: 80px;
@@ -704,6 +609,50 @@ export default function ZenstrinLandingPage() {
           opacity: ${isVisible ? 1 : 0};
           transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
           transition: opacity 1s ease 0.6s, transform 1s ease 0.6s;
+        }
+
+        .featured-post {
+          margin-top: 28px;
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 18px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 8px;
+          backdrop-filter: blur(6px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+          opacity: ${isVisible ? 1 : 0};
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
+          transition: opacity 1s ease 0.75s, transform 1s ease 0.75s, background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .featured-post .badge {
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #f7961c;
+          background: rgba(247, 150, 28, 0.15);
+          border: 1px solid rgba(247, 150, 28, 0.35);
+          padding: 4px 8px;
+          border-radius: 4px;
+        }
+
+        .featured-post a {
+          color: #cfd8ff;
+          text-decoration: none;
+          font-weight: 600;
+          transition: color 0.2s ease;
+        }
+
+        .featured-post:hover {
+          background: rgba(255, 255, 255, 0.09);
+          border-color: rgba(247, 150, 28, 0.5);
+        }
+
+        .featured-post a:hover {
+          color: #ffffff;
         }
         
         .btn-primary {
@@ -1006,7 +955,7 @@ export default function ZenstrinLandingPage() {
         .stat-number {
           font-size: 64px;
           font-weight: 700;
-          color: #ffffff;
+          color: #1a1a1a;
           display: block;
           margin-bottom: 10px;
           transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
@@ -1019,7 +968,7 @@ export default function ZenstrinLandingPage() {
         
         .stat-label {
           font-size: 16px;
-          color: rgba(255, 255, 255, 0.95);
+          color: rgba(2, 2, 2, 0.95);
           font-weight: 500;
           transition: opacity 0.3s ease;
         }
@@ -1225,10 +1174,10 @@ export default function ZenstrinLandingPage() {
             </div>
             <ul className="nav-links">
               <li>
-                <a href="#zenstrin">Zenstrin</a>
+                <a href="#zenfinder">ZenFinder</a>
               </li>
               <li>
-                <a href="#zenfinder">ZenFinder</a>
+                <a href="#zenstrin">Zenstrin</a>
               </li>
               <li>
                 <a href="/blog">Blog</a>
@@ -1269,7 +1218,46 @@ export default function ZenstrinLandingPage() {
         </a>
       </div>
 
-      <section className="hero" ref={heroRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+      <section className="hero" ref={heroRef} onMouseMove={(e) => {
+        if (!heroRef.current) return
+        const rect = heroRef.current.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+        const maxRadius = 180
+        const maxOffset = 12
+        const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
+        codeLines.forEach((line) => {
+          const lineRect = line.getBoundingClientRect()
+          const lineY = lineRect.top - rect.top + lineRect.height / 2
+          const lineX = lineRect.left - rect.left + lineRect.width / 2
+          const dx = mouseX - lineX
+          const dy = mouseY - lineY
+          const distance = Math.hypot(dx, dy)
+          if (distance < maxRadius) {
+            const intensity = (maxRadius - distance) / maxRadius
+            const unitX = dx / (distance || 1)
+            const unitY = dy / (distance || 1)
+            const offset = (intensity * intensity) * maxOffset
+            const tx = unitX * offset
+            const ty = unitY * offset
+            ;(line as HTMLElement).style.transform = `translate(${tx}px, ${ty}px) scale(${1 + intensity * 0.03})`
+            ;(line as HTMLElement).style.textShadow = `0 0 ${6 + intensity * 8}px rgba(247, 150, 28, ${0.25 + intensity * 0.25})`
+            ;(line as HTMLElement).style.color = `rgba(40, 66, 92, ${0.4 + intensity * 0.2})`
+          } else {
+            ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
+            ;(line as HTMLElement).style.textShadow = "0 0 2px rgba(247, 150, 28, 0.35)"
+            ;(line as HTMLElement).style.color = "rgba(40, 66, 92, 0.4)"
+          }
+        })
+      }} onMouseLeave={() => {
+        if (!heroRef.current) return
+        const codeLines = heroRef.current.querySelectorAll<HTMLDivElement>(".code-line")
+        codeLines.forEach((line) => {
+          ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
+          ;(line as HTMLElement).style.textShadow = "0 0 2px rgba(247, 150, 28, 0.35)"
+          ;(line as HTMLElement).style.color = "rgba(40, 66, 92, 0.4)"
+        })
+      }}>
         <div className="code-background" ref={codeBackgroundRef}></div>
         <div className="container">
           <div className="hero-content">
@@ -1278,20 +1266,63 @@ export default function ZenstrinLandingPage() {
               WE'RE THE MAKERS OF
               <span className="highlight">[ ZENFINDER ]</span>
             </h1>
-            <p className="hero-subtitle">Voice-first AI marketplace</p>
+            <p className="hero-subtitle">ZenFinder — the voice-first AI marketplace</p>
             <div className="hero-buttons">
               <a href="#" className="btn-primary">
-                REQUEST DEMO ↗
-              </a>
-              <a href="#" className="btn-secondary">
-                LEARN MORE ↗
+                TRY NOW ↗
               </a>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="zenstrin" className="white-section">
+      <section className="featured-blog-section" aria-labelledby="featured-blog-heading">
+        <div className="code-background" ref={featuredCodeRef}></div>
+        <div className="container">
+          <div className="featured-blog-card">
+            <div className="meta">
+              <span>Featured</span>
+              <span>•</span>
+              <span>From our blog</span>
+            </div>
+            <h3 id="featured-blog-heading" className="title">{featuredPostTitle}</h3>
+            <div className="actions">
+              <a className="read" href="/blog" aria-label="Read featured blog post">Read now ↗</a>
+              <a className="more" href="/blog">More posts →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="zenfinder" className="white-section" ref={statsRef}>
+        <div className="container">
+          <div className="section-header">
+            <div className="section-tag">ZENFINDER</div>
+            <h2 className="section-title">Voice-first AI marketplace</h2>
+            <p className="section-description">
+              Find a service provider in seconds — just by speaking. An AI-powered, voice-first marketplace that
+              instantly connects users with real service providers.
+            </p>
+          </div>
+
+          <div className="stats">
+            <div className="stat">
+              <span className="stat-number">{stats.items}+</span>
+              <span className="stat-label">Active Listings</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{stats.providers}+</span>
+              <span className="stat-label">Service Providers</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{stats.success}%</span>
+              <span className="stat-label">Success Rate</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="zenstrin" className="team-section">
         <div className="container">
           <div className="section-header">
             <div className="section-tag">Zenstrin Platform</div>
@@ -1397,34 +1428,6 @@ export default function ZenstrinLandingPage() {
         </div>
       </section>
 
-      <section id="zenfinder" className="team-section" ref={statsRef}>
-        <div className="container">
-          <div className="section-header">
-            <div className="section-tag">ZENFINDER</div>
-            <h2 className="section-title">Voice-first AI marketplace</h2>
-            <p className="section-description">
-              Find a service provider in seconds — just by speaking. An AI-powered, voice-first marketplace that
-              instantly connects users with real service providers.
-            </p>
-          </div>
-
-          <div className="stats">
-            <div className="stat">
-              <span className="stat-number">{stats.items}+</span>
-              <span className="stat-label">Active Listings</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number">{stats.providers}+</span>
-              <span className="stat-label">Service Providers</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number">{stats.success}%</span>
-              <span className="stat-label">Success Rate</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section id="blog" className="cta-section">
         <div className="container">
           <h2 className="section-title">The future of simplicity is here</h2>
@@ -1438,25 +1441,43 @@ export default function ZenstrinLandingPage() {
         </div>
       </section>
 
-      <footer id="contact">
-        <div className="container">
-          <div className="footer-content">
-            <div className="logo">
-              <img
-                src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png"
-                alt="Zenstrin Logo"
-                style={{ height: "40px" }}
-              />
+    {/* Footer */}
+    <footer className="border-t border-gray-200 py-12 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="mb-4">
+                <img 
+                  src="https://res.cloudinary.com/djbokbrgd/image/upload/v1761421748/WhatsApp_Image_2025-10-22_at_09.45.51_8b65409b-removebg-preview_puicov.png" 
+                  alt="Zenstrin Logo" 
+                  className="h-20 w-auto"
+                />
+              </div>
+              <p className="text-gray-600 text-sm font-light">Empowering the future of real estate and AI-driven commerce</p>
             </div>
-            <div className="footer-links">
-              <a href="#zenstrin">Zenstrin</a>
-              <a href="#zenfinder">ZenFinder</a>
-              <a href="/blog">Blog</a>
-              <a href="/contact">Contact</a>
-              <a href="/privacy-policy">Privacy</a>
+            <div>
+              <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
+                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li><a href="/blog" className="hover:text-[#f7961c] transition-colors">Blog</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li><a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">Privacy</a></li>
+              </ul>
             </div>
           </div>
-          <p className="copyright">© 2025 Zenstrin Technologies. All rights reserved.</p>
+          <div className="pt-8 border-t border-gray-200 text-center text-gray-600 text-sm">
+            <p>&copy; 2025 Zenstrin Technologies. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>
