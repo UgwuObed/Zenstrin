@@ -712,12 +712,12 @@ export default function ZenstrinLandingPage() {
             padding: 0 30px;
           }
           .featured-blog-grid {
+            max-width: 100%;
+            margin: 0;
             padding: 0 30px;
-            grid-auto-flow: column;
-            grid-auto-columns: 85%;
-            display: grid;
-            overflow: auto;
-            overflow-x: scroll;
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
             gap: 16px;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
@@ -726,6 +726,7 @@ export default function ZenstrinLandingPage() {
             scroll-padding: 0 30px;
           }
           .featured-blog-card {
+            flex: 0 0 85%;
             scroll-snap-align: start;
             min-width: 0; /* prevent overflow issues */
           }
