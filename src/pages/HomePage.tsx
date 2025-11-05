@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { getFeaturedPosts } from '../data/blogPost';
 
 export default function ZenstrinLandingPage() {
   const codeBackgroundRef = useRef<HTMLDivElement | null>(null)
@@ -12,35 +13,18 @@ export default function ZenstrinLandingPage() {
   const [stats, setStats] = useState({ items: 0, providers: 0, success: 0 })
   const statsRef = useRef<HTMLDivElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
-  const featuredPosts = [
-    {
-      id: 'post-1',
-      tag: 'Featured',
-      from: 'From our blog',
-      title: 'How AI voice search is reshaping marketplaces',
-      href: '/blog',
-      image: 'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1400&auto=format&fit=crop',
-      excerpt: 'What happens when intent is captured by voice and matched in realtime.'
-    },
-    {
-      id: 'post-2',
-      tag: 'Insights',
-      from: 'From our blog',
-      title: 'Designing voice-first experiences that convert',
-      href: '/blog',
-      image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?q=80&w=1400&auto=format&fit=crop',
-      excerpt: 'A practical guide to frictionless flows and trust-building UI.'
-    },
-    {
-      id: 'post-3',
-      tag: 'Engineering',
-      from: 'From our blog',
-      title: 'Realtime matching with vector search at scale',
-      href: '/blog',
-      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop',
-      excerpt: 'How we architect low-latency pipelines for marketplace search.'
-    },
-  ]
+  
+
+  const featuredPosts = getFeaturedPosts().map(post => ({
+    id: `post-${post.id}`,
+    tag: post.category,
+    from: 'From our blog',
+    title: post.title,
+    href: `/blog#${post.id}`, 
+    image: post.image,
+    excerpt: post.excerpt
+  }));
+
   const featuredGridRef = useRef<HTMLDivElement | null>(null)
   const scrollFeatured = (direction: number) => {
     const el = featuredGridRef.current
@@ -50,7 +34,6 @@ export default function ZenstrinLandingPage() {
   }
 
   useEffect(() => {
-    // Reveal featured cards on scroll
     const grid = featuredGridRef.current
     if (!grid) return
     const cards = Array.from(grid.querySelectorAll('.featured-blog-card'))
@@ -67,8 +50,6 @@ export default function ZenstrinLandingPage() {
     cards.forEach((c) => observer.observe(c))
     return () => observer.disconnect()
   }, [])
-
-  
 
   useEffect(() => {
     setIsVisible(true)
@@ -134,6 +115,78 @@ export default function ZenstrinLandingPage() {
       codeHTML += `<div class="code-line">${line}</div>`
     }
     codeBackground.innerHTML = codeHTML
+  }, [])
+
+  useEffect(() => {
+    if (!featuredCodeRef.current) return
+    const characters = "+-=/*<>[]{}()#@$%&|\\%%%%####@@@***+++===---:::;;;,,,111000//\\\\||"
+    const charsPerLine = 300
+    const lines = 160
+    let codeHTML = ""
+    for (let i = 0; i < lines; i++) {
+      let line = ""
+      for (let j = 0; j < charsPerLine; j++) {
+        if (Math.random() > 0.5) {
+          line += characters[Math.floor(Math.random() * characters.length)]
+        } else {
+          line += " "
+        }
+      }
+      codeHTML += `<div class="code-line">${line}</div>`
+    }
+    featuredCodeRef.current.innerHTML = codeHTML
+  }, [])
+
+
+  useEffect(() => {
+    const container = heroRef.current
+    if (!container) return
+
+  
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) return
+
+    const maxRadius = 180
+    const maxOffset = 16
+    let rafId: number
+
+    const animate = (time: number) => {
+      const rect = container.getBoundingClientRect()
+   
+      const t = time / 1000
+      const mouseX = rect.width / 2 + Math.cos(t * 1.0) * rect.width * 0.3
+      const mouseY = rect.height / 2 + Math.sin(t * 1.6) * rect.height * 0.25
+
+      const codeLines = container.querySelectorAll<HTMLDivElement>('.code-line')
+      codeLines.forEach((line) => {
+        const lineRect = line.getBoundingClientRect()
+        const lineY = lineRect.top - rect.top + lineRect.height / 2
+        const lineX = lineRect.left - rect.left + lineRect.width / 2
+        const dx = mouseX - lineX
+        const dy = mouseY - lineY
+        const distance = Math.hypot(dx, dy)
+        if (distance < maxRadius) {
+          const intensity = (maxRadius - distance) / maxRadius
+          const unitX = dx / (distance || 1)
+          const unitY = dy / (distance || 1)
+          const offset = (intensity * intensity) * maxOffset
+          const tx = unitX * offset
+          const ty = unitY * offset
+          ;(line as HTMLElement).style.transform = `translate(${tx}px, ${ty}px) scale(${1 + intensity * 0.03})`
+          ;(line as HTMLElement).style.textShadow = `0 0 ${6 + intensity * 8}px rgba(247, 150, 28, ${0.25 + intensity * 0.25})`
+          ;(line as HTMLElement).style.color = `rgba(247, 150, 28, ${0.4 + intensity * 0.2})`
+        } else {
+          ;(line as HTMLElement).style.transform = 'translate(0, 0) scale(1)'
+          ;(line as HTMLElement).style.textShadow = '0 0 2px rgba(247, 150, 28, 0.35)'
+          ;(line as HTMLElement).style.color = 'rgba(247, 150, 28, 0.4)'
+        }
+      })
+
+      rafId = requestAnimationFrame(animate)
+    }
+
+    rafId = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(rafId)
   }, [])
 
   useEffect(() => {
@@ -223,13 +276,15 @@ export default function ZenstrinLandingPage() {
         }
         
         .logo img {
-          height: 56px;
+          height: 56px; /* layout box size stays the same */
           width: auto;
+          transform: scale(1.2); /* visually larger without affecting navbar layout */
+          transform-origin: left center;
           transition: transform 0.3s ease;
         }
 
         .logo img:hover {
-          transform: scale(1.05);
+          transform: scale(1.25);
         }
         
         .nav-links {
@@ -412,7 +467,7 @@ export default function ZenstrinLandingPage() {
           flex-direction: column;
           z-index: 2;
           transform: translateY(0);
-          animation: codeDrift 22s linear infinite alternate;
+          animation: none !important;
         }
 
         .code-background::before {
@@ -436,7 +491,7 @@ export default function ZenstrinLandingPage() {
         
     .code-line {
       opacity: 1;
-      animation: shimmer 7s ease-in-out infinite;
+      animation: none !important;
       transition: transform 0.2s ease-out, text-shadow 0.2s ease-out, color 0.2s ease-out;
       text-shadow: 0 0 2px rgba(247, 150, 28, 0.35);
       will-change: opacity, transform;
@@ -524,7 +579,7 @@ export default function ZenstrinLandingPage() {
         .featured-blog-section .code-background {
           z-index: 0;
           opacity: 0.3;
-          animation: codeDrift 28s linear infinite alternate;
+          animation: none !important;
         }
 
         .featured-blog-header {

@@ -1,263 +1,15 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, Menu, X, Calendar, User, Clock, Search, ArrowLeft } from 'lucide-react';
+import { getAllPosts } from '../data/blogPost';
 
-const blogPosts = [
-  {
-    id: 1,
-    title: 'The Future of Property Management: AI-Powered Automation',
-    excerpt: 'Discover how artificial intelligence is transforming the property management industry and helping landlords save up to 30% in administrative time.',
-    category: 'Property Management',
-    author: 'Sarah Johnson',
-    date: 'October 15, 2025',
-    readTime: '5 min read',
-    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=400&fit=crop',
-    content: `
-      <p>Artificial intelligence is revolutionizing the property management industry in ways we never imagined. From automated tenant screening to predictive maintenance, AI-powered solutions are helping landlords and property managers save valuable time and resources.</p>
-      
-      <h2>The Rise of Smart Property Management</h2>
-      <p>Traditional property management has long been plagued by manual processes, paperwork, and time-consuming administrative tasks. However, with the advent of AI technology, we're seeing a significant shift towards automation and efficiency.</p>
-      
-      <p>According to recent studies, property managers who implement AI solutions report saving up to 30% in administrative time. This translates to more time spent on strategic decision-making and tenant relationships rather than mundane tasks.</p>
-      
-      <h2>Key AI Applications in Property Management</h2>
-      <ul>
-        <li><strong>Automated Tenant Screening:</strong> AI algorithms can analyze applicant data, credit history, and rental patterns to provide comprehensive tenant assessments.</li>
-        <li><strong>Predictive Maintenance:</strong> Machine learning models can predict when maintenance issues are likely to occur, allowing for proactive repairs.</li>
-        <li><strong>Smart Communication:</strong> AI-powered chatbots handle routine tenant inquiries 24/7, freeing up property managers for more complex issues.</li>
-        <li><strong>Rent Optimization:</strong> AI analyzes market data to suggest optimal rental prices based on location, amenities, and market trends.</li>
-      </ul>
-      
-      <h2>Real-World Impact</h2>
-      <p>One property management company reported a 45% reduction in maintenance costs after implementing AI-powered predictive maintenance. Another saw tenant satisfaction scores increase by 35% due to faster response times and improved communication.</p>
-      
-      <p>The future of property management is here, and it's powered by artificial intelligence. As these technologies continue to evolve, we can expect even greater efficiencies and innovations in the industry.</p>
-    `
-  },
-  {
-    id: 2,
-    title: 'Voice Commerce: The $55 Billion Opportunity',
-    excerpt: 'Exploring the explosive growth of voice-first marketplaces and how ZenFinder is leading the charge in connecting users with service providers.',
-    category: 'AI & Voice Tech',
-    author: 'Michael Chen',
-    date: 'October 12, 2025',
-    readTime: '7 min read',
-    image: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&h=400&fit=crop',
-    content: `
-      <p>Voice commerce is rapidly emerging as one of the most exciting frontiers in digital commerce, with projections indicating it will become a $55 billion market by 2027. This transformative technology is changing how consumers discover and purchase services.</p>
-      
-      <h2>The Voice-First Revolution</h2>
-      <p>With the proliferation of smart speakers and voice assistants, consumers are increasingly comfortable using voice commands to search for services, make purchases, and interact with businesses. This shift represents a fundamental change in user behavior that forward-thinking companies are leveraging.</p>
-      
-      <h2>ZenFinder's Innovative Approach</h2>
-      <p>At ZenFinder, we're pioneering voice-first marketplace technology that connects users with local service providers through natural language interactions. Our platform understands context, preferences, and location to deliver highly relevant recommendations.</p>
-      
-      <p>Key features of our voice commerce platform include:</p>
-      <ul>
-        <li>Natural language processing for intuitive user interactions</li>
-        <li>Personalized recommendations based on user history and preferences</li>
-        <li>Seamless integration with existing service provider systems</li>
-        <li>Real-time availability and booking capabilities</li>
-      </ul>
-      
-      <h2>Market Impact and Opportunities</h2>
-      <p>Early adopters of voice commerce are seeing remarkable results. Service providers using ZenFinder report a 60% increase in qualified leads and a 40% reduction in customer acquisition costs. For consumers, the convenience of finding and booking services through voice commands is driving higher engagement and satisfaction.</p>
-      
-      <p>As voice technology continues to improve and consumer adoption grows, the opportunities in voice commerce will only expand. Businesses that embrace this technology now will be well-positioned to capture market share in this rapidly growing segment.</p>
-    `
-  },
-  {
-    id: 3,
-    title: 'Compliance Made Simple: Navigating Property Regulations in 2025',
-    excerpt: 'A comprehensive guide to staying compliant with evolving property management regulations and how technology can help.',
-    category: 'Industry Insights',
-    author: 'David Martinez',
-    date: 'October 8, 2025',
-    readTime: '6 min read',
-    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=400&fit=crop',
-    content: `
-      <p>Staying compliant with property management regulations has never been more challenging—or more important. With new laws and regulations emerging at both state and federal levels, property managers need robust systems to ensure compliance and avoid costly penalties.</p>
-      
-      <h2>The Changing Regulatory Landscape</h2>
-      <p>2025 has brought significant changes to property management regulations, including updated fair housing requirements, new energy efficiency standards, and enhanced tenant protection laws. Keeping up with these changes manually is nearly impossible for busy property managers.</p>
-      
-      <h2>Technology Solutions for Compliance</h2>
-      <p>Modern property management platforms like Zenstrin are incorporating compliance features that automatically update with regulatory changes. These systems provide:</p>
-      
-      <ul>
-        <li>Automated document generation with current legal requirements</li>
-        <li>Real-time alerts about regulatory changes in your area</li>
-        <li>Compliance checklists for property inspections and maintenance</li>
-        <li>Digital record-keeping for audit trails</li>
-      </ul>
-      
-      <h2>Best Practices for Compliance Management</h2>
-      <p>Beyond technology, successful compliance management requires a proactive approach:</p>
-      
-      <ol>
-        <li>Regular training for staff on current regulations</li>
-        <li>Documented processes for common compliance scenarios</li>
-        <li>Quarterly reviews of compliance procedures</li>
-        <li>Partnership with legal experts specializing in property law</li>
-      </ol>
-      
-      <h2>The Cost of Non-Compliance</h2>
-      <p>The financial and reputational costs of compliance failures can be devastating. Fines for regulatory violations have increased by 25% in the past year alone, not to mention the potential for lawsuits and damage to your brand reputation.</p>
-      
-      <p>By leveraging technology and implementing strong compliance processes, property managers can navigate the complex regulatory environment with confidence and focus on growing their business.</p>
-    `
-  },
-  {
-    id: 4,
-    title: 'Introducing Zenstrin 2.0: Enhanced Tenant Communication Features',
-    excerpt: 'We are excited to announce major updates to our tenant management system, including real-time chat and automated reminders.',
-    category: 'Product Updates',
-    author: 'Emily Davis',
-    date: 'October 5, 2025',
-    readTime: '4 min read',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop',
-    content: `
-      <p>We're thrilled to announce the release of Zenstrin 2.0, our most significant update yet, featuring groundbreaking improvements to tenant communication and engagement tools.</p>
-      
-      <h2>Real-Time Chat System</h2>
-      <p>Our new real-time chat feature enables instant communication between property managers and tenants. Unlike email or traditional messaging, this system provides immediate responses and keeps all communication organized in one place.</p>
-      
-      <p>Key benefits include:</p>
-      <ul>
-        <li>Faster response times to tenant inquiries</li>
-        <li>Reduced communication gaps and misunderstandings</li>
-        <li>Automated responses for common questions</li>
-        <li>Secure message history for reference</li>
-      </ul>
-      
-      <h2>Smart Automated Reminders</h2>
-      <p>Never miss important deadlines again with our enhanced automated reminder system. Zenstrin 2.0 now sends intelligent reminders for:</p>
-      
-      <ul>
-        <li>Rent payments and due dates</li>
-        <li>Maintenance schedule updates</li>
-        <li>Lease renewal deadlines</li>
-        <li>Property inspection appointments</li>
-        <li>Community events and notices</li>
-      </ul>
-      
-      <h2>Enhanced Mobile Experience</h2>
-      <p>We've completely redesigned our mobile app with a focus on user experience. Tenants can now:</p>
-      
-      <ul>
-        <li>Submit maintenance requests with photos</li>
-        <li>Pay rent securely through the app</li>
-        <li>Access important documents anytime</li>
-        <li>Receive push notifications for urgent updates</li>
-      </ul>
-      
-      <h2>Getting Started with Zenstrin 2.0</h2>
-      <p>Existing customers will automatically receive the update, and we've prepared comprehensive guides and training materials to help you make the most of these new features. Schedule a demo with our team to see Zenstrin 2.0 in action and learn how it can transform your tenant communication strategy.</p>
-    `
-  },
-  {
-    id: 5,
-    title: 'How Voice AI is Revolutionizing Customer Service',
-    excerpt: 'Learn how businesses are leveraging voice AI technology to provide instant, personalized customer experiences.',
-    category: 'AI & Voice Tech',
-    author: 'Alex Thompson',
-    date: 'October 1, 2025',
-    readTime: '5 min read',
-    image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=400&fit=crop',
-    content: `
-      <p>Voice AI is transforming customer service from a cost center to a strategic advantage. Businesses that implement voice AI solutions are seeing dramatic improvements in customer satisfaction, operational efficiency, and cost reduction.</p>
-      
-      <h2>The Evolution of Customer Service</h2>
-      <p>Traditional customer service models rely heavily on human agents, leading to long wait times, inconsistent experiences, and high operational costs. Voice AI changes this paradigm by providing instant, personalized assistance 24/7.</p>
-      
-      <h2>Key Benefits of Voice AI in Customer Service</h2>
-      <ul>
-        <li><strong>24/7 Availability:</strong> Voice AI systems never sleep, providing constant support to customers across time zones.</li>
-        <li><strong>Instant Responses:</strong> Customers get immediate answers to their questions without waiting on hold.</li>
-        <li><strong>Personalized Interactions:</strong> Advanced AI understands context and customer history to provide tailored assistance.</li>
-        <li><strong>Multilingual Support:</strong> Serve customers in their preferred language without hiring bilingual staff.</li>
-        <li><strong>Scalability:</strong> Handle thousands of simultaneous conversations without additional costs.</li>
-      </ul>
-      
-      <h2>Real-World Success Stories</h2>
-      <p>Companies implementing voice AI for customer service report impressive results:</p>
-      
-      <ul>
-        <li>A major retail chain reduced customer service costs by 40% while improving satisfaction scores</li>
-        <li>A financial services company handled 60% of customer inquiries through voice AI, freeing human agents for complex issues</li>
-        <li>A property management firm saw a 50% reduction in call volume to their support center</li>
-      </ul>
-      
-      <h2>Implementing Voice AI Successfully</h2>
-      <p>Successful voice AI implementation requires careful planning:</p>
-      
-      <ol>
-        <li>Identify common customer inquiries that can be automated</li>
-        <li>Design natural, conversational flows</li>
-        <li>Ensure seamless handoff to human agents when needed</li>
-        <li>Continuously train and improve the AI based on real interactions</li>
-      </ol>
-      
-      <p>The future of customer service is conversational, personalized, and available everywhere. Voice AI is making this future a reality today.</p>
-    `
-  },
-  {
-    id: 6,
-    title: 'Small Property Managers: Competing in a Digital World',
-    excerpt: 'Strategies and tools that help small to mid-size property management agencies stay competitive without enterprise budgets.',
-    category: 'Industry Insights',
-    author: 'Rachel Green',
-    date: 'September 28, 2025',
-    readTime: '6 min read',
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop',
-    content: `
-      <p>Small and mid-size property management companies face unique challenges in today's digital landscape. While large corporations have massive budgets for technology and marketing, smaller agencies can leverage smart strategies and affordable tools to compete effectively.</p>
-      
-      <h2>The Digital Advantage for Smaller Players</h2>
-      <p>While large companies struggle with bureaucracy and slow decision-making, smaller property managers can be more agile and responsive. This flexibility, combined with the right technology, creates significant competitive advantages.</p>
-      
-      <h2>Essential Tools for Small Property Managers</h2>
-      <p>You don't need enterprise-level budgets to access powerful property management tools. Focus on these essential categories:</p>
-      
-      <ul>
-        <li><strong>All-in-One Management Platforms:</strong> Solutions like Zenstrin provide comprehensive features at affordable price points</li>
-        <li><strong>Digital Marketing Tools:</strong> Cost-effective platforms for social media management and email marketing</li>
-        <li><strong>Communication Systems:</strong> Automated messaging and tenant portals improve service without increasing staff</li>
-        <li><strong>Financial Management:</strong> Cloud-based accounting and rent collection systems</li>
-      </ul>
-      
-      <h2>Differentiation Strategies</h2>
-      <p>Smaller agencies can compete by focusing on areas where large companies often fall short:</p>
-      
-      <ol>
-        <li><strong>Personalized Service:</strong> Build strong relationships with property owners and tenants</li>
-        <li><strong>Local Expertise:</strong> Leverage deep knowledge of specific neighborhoods and markets</li>
-        <li><strong>Specialization:</strong> Focus on specific property types or client segments</li>
-        <li><strong>Community Involvement:</strong> Build reputation through local partnerships and sponsorships</li>
-      </ol>
-      
-      <h2>Cost-Effective Marketing Approaches</h2>
-      <p>Smart marketing doesn't require big budgets:</p>
-      
-      <ul>
-        <li>Leverage social media to build community and showcase properties</li>
-        <li>Implement referral programs to generate qualified leads</li>
-        <li>Create valuable content that demonstrates your expertise</li>
-        <li>Optimize your website for local search results</li>
-      </ul>
-      
-      <h2>Success Stories</h2>
-      <p>Many small property management companies are thriving by embracing these strategies. One agency with just 200 units under management increased their portfolio by 35% in one year by focusing on personalized service and leveraging affordable technology tools.</p>
-      
-      <p>The key is to be strategic about where you invest your limited resources and focus on delivering exceptional value where large competitors can't easily match you.</p>
-    `
-  }
-];
+const blogPosts = getAllPosts();
 
 function BlogPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [highlightedPostId, setHighlightedPostId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -265,12 +17,54 @@ function BlogPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const categories = ['All', 'Property Management', 'AI & Voice Tech', 'Industry Insights', 'Product Updates'];
+  // Handle hash routing when component mounts
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const postId = hash.replace('#', '');
+        setHighlightedPostId(postId);
+        
+        // Scroll to the post after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          const element = document.getElementById(`post-${postId}`);
+          if (element) {
+            const yOffset = -100; // Adjust for fixed header
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+            
+            // Add highlight effect
+            element.style.transition = 'all 0.5s ease';
+            element.style.boxShadow = '0 0 0 3px rgba(247, 150, 28, 0.3)';
+            element.style.backgroundColor = 'rgba(247, 150, 28, 0.05)';
+            
+            // Remove highlight after 3 seconds
+            setTimeout(() => {
+              element.style.boxShadow = '';
+              element.style.backgroundColor = '';
+              setHighlightedPostId(null);
+            }, 3000);
+          }
+        }, 100);
+      }
+    };
+
+    // Check for hash on initial load
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  const categories = ['All', 'Product Launch', 'Funding', 'Property Management', 'AI & Voice Tech', 'Industry Insights', 'Product Updates'];
 
   const filteredPosts = selectedCategory === 'All' 
     ? blogPosts 
     : blogPosts.filter(post => post.category === selectedCategory);
-
 
   if (selectedPost) {
     return <ArticleDetail post={selectedPost} onBack={() => setSelectedPost(null)} />;
@@ -364,7 +158,13 @@ function BlogPage() {
           {/* Featured Post */}
           {selectedCategory === 'All' && (
             <div className="mb-16">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-colors duration-200 cursor-pointer" onClick={() => setSelectedPost(blogPosts[0])}>
+              <div 
+                id={`post-${blogPosts[0].id}`}
+                className={`bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-colors duration-200 cursor-pointer ${
+                  highlightedPostId === blogPosts[0].id.toString() ? 'ring-2 ring-[#f7961c] bg-orange-50' : ''
+                }`} 
+                onClick={() => setSelectedPost(blogPosts[0])}
+              >
                 <div className="grid md:grid-cols-2 gap-0">
                   <div className="h-64 md:h-auto bg-gray-200">
                     <img 
@@ -404,7 +204,12 @@ function BlogPage() {
           {/* Regular Posts Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.slice(selectedCategory === 'All' ? 1 : 0).map((post) => (
-              <BlogCard key={post.id} post={post} onReadMore={() => setSelectedPost(post)} />
+              <BlogCard 
+                key={post.id} 
+                post={post} 
+                onReadMore={() => setSelectedPost(post)}
+                isHighlighted={highlightedPostId === post.id.toString()}
+              />
             ))}
           </div>
         </div>
@@ -475,9 +280,15 @@ function BlogPage() {
   );
 }
 
-function BlogCard({ post, onReadMore }: { post: any, onReadMore: () => void }) {
+function BlogCard({ post, onReadMore, isHighlighted }: { post: any, onReadMore: () => void, isHighlighted?: boolean }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-all duration-200 hover:shadow-lg cursor-pointer" onClick={onReadMore}>
+    <div 
+      id={`post-${post.id}`}
+      className={`bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-[#f7961c] transition-all duration-200 hover:shadow-lg cursor-pointer ${
+        isHighlighted ? 'ring-2 ring-[#f7961c] bg-orange-50' : ''
+      }`} 
+      onClick={onReadMore}
+    >
       <div className="h-48 bg-gray-200">
         <img 
           src={post.image} 
@@ -509,6 +320,7 @@ function BlogCard({ post, onReadMore }: { post: any, onReadMore: () => void }) {
     </div>
   );
 }
+
 function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
   const relatedPosts = blogPosts.filter(p => 
     p.id !== post.id && p.category === post.category
@@ -591,7 +403,8 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
             prose-li:text-gray-700 prose-li:mb-2
             prose-strong:text-gray-900 prose-strong:font-semibold
             prose-ul:my-6 prose-ol:my-6
-            prose-a:text-[#f7961c] prose-a:no-underline hover:prose-a:underline"
+            prose-a:text-[#f7961c] prose-a:no-underline hover:prose-a:underline
+            prose-blockquote:border-l-[#f7961c] prose-blockquote:bg-orange-50 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-lg"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
