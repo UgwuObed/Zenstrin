@@ -12,7 +12,61 @@ export default function ZenstrinLandingPage() {
   const [stats, setStats] = useState({ items: 0, providers: 0, success: 0 })
   const statsRef = useRef<HTMLDivElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
-  const featuredPostTitle = "How AI voice search is reshaping marketplaces"
+  const featuredPosts = [
+    {
+      id: 'post-1',
+      tag: 'Featured',
+      from: 'From our blog',
+      title: 'How AI voice search is reshaping marketplaces',
+      href: '/blog',
+      image: 'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1400&auto=format&fit=crop',
+      excerpt: 'What happens when intent is captured by voice and matched in realtime.'
+    },
+    {
+      id: 'post-2',
+      tag: 'Insights',
+      from: 'From our blog',
+      title: 'Designing voice-first experiences that convert',
+      href: '/blog',
+      image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?q=80&w=1400&auto=format&fit=crop',
+      excerpt: 'A practical guide to frictionless flows and trust-building UI.'
+    },
+    {
+      id: 'post-3',
+      tag: 'Engineering',
+      from: 'From our blog',
+      title: 'Realtime matching with vector search at scale',
+      href: '/blog',
+      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop',
+      excerpt: 'How we architect low-latency pipelines for marketplace search.'
+    },
+  ]
+  const featuredGridRef = useRef<HTMLDivElement | null>(null)
+  const scrollFeatured = (direction: number) => {
+    const el = featuredGridRef.current
+    if (!el) return
+    const amount = Math.max(320, el.clientWidth / 2)
+    el.scrollBy({ left: amount * direction, behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    // Reveal featured cards on scroll
+    const grid = featuredGridRef.current
+    if (!grid) return
+    const cards = Array.from(grid.querySelectorAll('.featured-blog-card'))
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in')
+          }
+        })
+      },
+      { threshold: 0.2 }
+    )
+    cards.forEach((c) => observer.observe(c))
+    return () => observer.disconnect()
+  }, [])
 
   
 
@@ -304,7 +358,15 @@ export default function ZenstrinLandingPage() {
 
         .mobile-menu .nav-cta {
           margin-top: 20px;
-          display: inline-block;
+          display: block;
+          width: 100%;
+          text-align: center;
+          background: #f7961c;
+          color: #ffffff;
+          border: 1px solid #f7961c;
+          font-weight: 700;
+          padding: 14px 18px;
+          border-radius: 8px;
         }
         
         .hero {
@@ -342,7 +404,7 @@ export default function ZenstrinLandingPage() {
           font-family: 'Courier New', monospace;
           font-size: 16px;
           line-height: 1.4;
-          color: rgba(40, 66, 92, 0.4);
+          color: rgba(247, 150, 28, 0.4);
           overflow: hidden;
           white-space: pre;
           pointer-events: none;
@@ -350,7 +412,7 @@ export default function ZenstrinLandingPage() {
           flex-direction: column;
           z-index: 2;
           transform: translateY(0);
-          animation: none !important;
+          animation: codeDrift 22s linear infinite alternate;
         }
 
         .code-background::before {
@@ -374,10 +436,15 @@ export default function ZenstrinLandingPage() {
         
     .code-line {
       opacity: 1;
-      animation: none !important;
+      animation: shimmer 7s ease-in-out infinite;
       transition: transform 0.2s ease-out, text-shadow 0.2s ease-out, color 0.2s ease-out;
       text-shadow: 0 0 2px rgba(247, 150, 28, 0.35);
+      will-change: opacity, transform;
     }
+
+    .code-line:nth-child(3n) { animation-delay: 0.6s; }
+    .code-line:nth-child(4n) { animation-delay: 1.2s; }
+    .code-line:nth-child(5n) { animation-delay: 1.8s; }
         
         @keyframes fadeIn {
           to { opacity: 1; }
@@ -386,6 +453,11 @@ export default function ZenstrinLandingPage() {
         @keyframes shimmer {
           0%, 100% { opacity: 0.45; }
           50% { opacity: 0.8; }
+        }
+
+        @keyframes codeDrift {
+          0% { transform: translateY(0) translateX(0); }
+          100% { transform: translateY(-30px) translateX(-20px); }
         }
 
         @keyframes glitch {
@@ -451,20 +523,115 @@ export default function ZenstrinLandingPage() {
 
         .featured-blog-section .code-background {
           z-index: 0;
-          opacity: 0.35;
+          opacity: 0.3;
+          animation: codeDrift 28s linear infinite alternate;
+        }
+
+        .featured-blog-header {
+          max-width: 1200px;
+          margin: -40px auto 24px;
+          padding: 0 60px;
+          color: #cfd8ff;
+        }
+
+        .featured-nav {
+          max-width: 1200px;
+          margin: 16px auto 0;
+          padding: 0 60px;
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+
+        .featured-nav button {
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.15);
+          color: #cfd8ff;
+          padding: 8px 10px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .featured-nav button:hover {
+          background: rgba(247,150,28,0.15);
+          border-color: rgba(247,150,28,0.45);
+          transform: translateY(-1px);
+        }
+
+        .featured-blog-grid {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 60px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 24px;
+          position: relative;
+          z-index: 1;
+          overflow: visible;
         }
 
         .featured-blog-card {
-          margin: -40px auto 0; 
-          max-width: 960px;
           background: rgba(9, 12, 20, 0.7);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          border-radius: 14px;
-          padding: 28px 28px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 12px;
+          padding: 22px 22px;
           backdrop-filter: blur(10px);
-          box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+          transition: transform 0.25s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.25s ease, opacity 0.4s ease;
           position: relative;
-          z-index: 1;
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(10px);
+        }
+
+        .featured-blog-card:hover {
+          transform: translateY(-6px);
+          border-color: rgba(247, 150, 28, 0.5);
+          background: rgba(12, 16, 24, 0.82);
+          box-shadow: 0 28px 70px rgba(0,0,0,0.55);
+        }
+
+        .featured-blog-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: radial-gradient(circle at 10% 10%, rgba(247,150,28,0.12), transparent 30%),
+                      radial-gradient(circle at 90% 20%, rgba(79,108,182,0.18), transparent 35%),
+                      radial-gradient(circle at 50% 120%, rgba(247,150,28,0.08), transparent 40%);
+          animation: glowShift 6s ease-in-out infinite;
+        }
+
+        .featured-blog-card.in {
+          animation: cardEnter 0.6s ease forwards;
+        }
+
+        .featured-blog-card.in:nth-child(2) { animation-delay: 0.08s; }
+        .featured-blog-card.in:nth-child(3) { animation-delay: 0.16s; }
+        .featured-blog-card.in:nth-child(4) { animation-delay: 0.24s; }
+        .featured-blog-card.in:nth-child(5) { animation-delay: 0.32s; }
+
+        .featured-thumb {
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          border-radius: 8px;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.08);
+          background: #0e1420;
+        }
+
+        .featured-thumb img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          filter: saturate(1.05);
+          transition: transform 0.4s ease;
+        }
+
+        .featured-blog-card:hover .featured-thumb img {
+          transform: scale(1.04);
         }
 
         .featured-blog-card .meta {
@@ -480,9 +647,23 @@ export default function ZenstrinLandingPage() {
         .featured-blog-card .title {
           margin-top: 12px;
           color: #e9eeff;
-          font-size: 30px;
+          font-size: 24px;
           line-height: 1.25;
           font-weight: 800;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .featured-blog-card .excerpt {
+          margin-top: 8px;
+          color: #9fb0ff;
+          font-size: 14px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         .featured-blog-card .actions {
@@ -517,6 +698,73 @@ export default function ZenstrinLandingPage() {
 
         .featured-blog-card .more {
           color: #cfd8ff;
+        }
+
+        /* Responsive featured grid */
+        @media (max-width: 1024px) {
+          .featured-blog-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .featured-blog-header {
+            padding: 0 30px;
+          }
+          .featured-blog-grid {
+            padding: 0 30px;
+            grid-auto-flow: column;
+            grid-auto-columns: 85%;
+            display: grid;
+            overflow: auto;
+            overflow-x: scroll;
+            gap: 16px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            overscroll-behavior-x: contain;
+            scroll-padding: 0 30px;
+          }
+          .featured-blog-card {
+            scroll-snap-align: start;
+            min-width: 0; /* prevent overflow issues */
+          }
+          .featured-blog-card:last-child { margin-right: 30px; }
+          .featured-blog-grid::-webkit-scrollbar { display: none; }
+          .featured-blog-section::before,
+          .featured-blog-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            pointer-events: none;
+            z-index: 2;
+          }
+          .featured-blog-section::before {
+            left: 0;
+            background: linear-gradient(90deg, rgba(10,10,15,1), rgba(10,10,15,0));
+          }
+          .featured-blog-section::after {
+            right: 0;
+            background: linear-gradient(270deg, rgba(10,10,15,1), rgba(10,10,15,0));
+          }
+          .featured-blog-card .title { font-size: 20px; }
+          .featured-blog-card .excerpt { font-size: 13px; }
+          .featured-nav { display: none; }
+        }
+
+        @keyframes cardEnter {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowShift {
+          0%, 100% { opacity: 0.75; }
+          50% { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .featured-blog-card::before { animation: none; }
+          .featured-blog-card.in { animation: none; opacity: 1; transform: none; }
         }
 
         .hero-content::before,
@@ -1122,6 +1370,13 @@ export default function ZenstrinLandingPage() {
           .mobile-menu-btn {
             display: block;
           }
+
+          /* Improve header CTA appearance on mobile */
+          .nav-cta {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+          }
           
           .feature-grid {
             grid-template-columns: 1fr;
@@ -1207,7 +1462,7 @@ export default function ZenstrinLandingPage() {
         <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>
           Zenstrin
         </a>
-        <a href="#zenfinder" onClick={() => setIsMenuOpen(false)}>
+        <a href="https://www.zenfinder.ai" onClick={() => setIsMenuOpen(false)}>
           ZenFinder
         </a>
         <a href="/blog" onClick={() => setIsMenuOpen(false)}>
@@ -1242,11 +1497,11 @@ export default function ZenstrinLandingPage() {
             const ty = unitY * offset
             ;(line as HTMLElement).style.transform = `translate(${tx}px, ${ty}px) scale(${1 + intensity * 0.03})`
             ;(line as HTMLElement).style.textShadow = `0 0 ${6 + intensity * 8}px rgba(247, 150, 28, ${0.25 + intensity * 0.25})`
-            ;(line as HTMLElement).style.color = `rgba(40, 66, 92, ${0.4 + intensity * 0.2})`
+            ;(line as HTMLElement).style.color = `rgba(247, 150, 28, ${0.4 + intensity * 0.2})`
           } else {
             ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
             ;(line as HTMLElement).style.textShadow = "0 0 2px rgba(247, 150, 28, 0.35)"
-            ;(line as HTMLElement).style.color = "rgba(40, 66, 92, 0.4)"
+            ;(line as HTMLElement).style.color = "rgba(247, 150, 28, 0.4)"
           }
         })
       }} onMouseLeave={() => {
@@ -1255,7 +1510,7 @@ export default function ZenstrinLandingPage() {
         codeLines.forEach((line) => {
           ;(line as HTMLElement).style.transform = "translate(0, 0) scale(1)"
           ;(line as HTMLElement).style.textShadow = "0 0 2px rgba(247, 150, 28, 0.35)"
-          ;(line as HTMLElement).style.color = "rgba(40, 66, 92, 0.4)"
+          ;(line as HTMLElement).style.color = "rgba(247, 150, 28, 0.4)"
         })
       }}>
         <div className="code-background" ref={codeBackgroundRef}></div>
@@ -1268,7 +1523,7 @@ export default function ZenstrinLandingPage() {
             </h1>
             <p className="hero-subtitle">ZenFinder — the voice-first AI marketplace</p>
             <div className="hero-buttons">
-              <a href="#" className="btn-primary">
+              <a href="https://www.zenfinder.ai" className="btn-primary">
                 TRY NOW ↗
               </a>
             </div>
@@ -1278,19 +1533,34 @@ export default function ZenstrinLandingPage() {
 
       <section className="featured-blog-section" aria-labelledby="featured-blog-heading">
         <div className="code-background" ref={featuredCodeRef}></div>
-        <div className="container">
-          <div className="featured-blog-card">
-            <div className="meta">
-              <span>Featured</span>
-              <span>•</span>
-              <span>From our blog</span>
+        <div className="featured-blog-header">
+          <div className="meta" id="featured-blog-heading">Featured • From our blog</div>
+        </div>
+        <div className="featured-blog-grid" ref={featuredGridRef}>
+          {featuredPosts.map((post) => (
+            <div key={post.id} className="featured-blog-card">
+              {post.image && (
+                <div className="featured-thumb">
+                  <img src={post.image} alt={post.title} />
+                </div>
+              )}
+              <div className="meta">
+                <span>{post.tag}</span>
+                <span>•</span>
+                <span>{post.from}</span>
+              </div>
+              <h3 className="title">{post.title}</h3>
+              {post.excerpt && <p className="excerpt">{post.excerpt}</p>}
+              <div className="actions">
+                <a className="read" href={post.href} aria-label={`Read ${post.title}`}>Read now ↗</a>
+                <a className="more" href="/blog">More posts →</a>
+              </div>
             </div>
-            <h3 id="featured-blog-heading" className="title">{featuredPostTitle}</h3>
-            <div className="actions">
-              <a className="read" href="/blog" aria-label="Read featured blog post">Read now ↗</a>
-              <a className="more" href="/blog">More posts →</a>
-            </div>
-          </div>
+          ))}
+        </div>
+        <div className="featured-nav">
+          <button type="button" aria-label="Scroll left" onClick={() => scrollFeatured(-1)}>◀</button>
+          <button type="button" aria-label="Scroll right" onClick={() => scrollFeatured(1)}>▶</button>
         </div>
       </section>
 
@@ -1435,7 +1705,7 @@ export default function ZenstrinLandingPage() {
             Whether you're managing properties or finding a reliable professional, Zenstrin Technologies bridges the gap
             between AI automation and human interaction.
           </p>
-          <a href="#contact" className="btn-primary">
+          <a href="/contact" className="btn-primary">
             Get Started Today
           </a>
         </div>
@@ -1458,8 +1728,8 @@ export default function ZenstrinLandingPage() {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
+                <li><a href="https://www.zenfinder.ai" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
               </ul>
             </div>
             <div>
