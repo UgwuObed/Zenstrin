@@ -1485,10 +1485,10 @@ export default function ZenstrinLandingPage() {
             </div>
             <ul className="nav-links">
               <li>
-                <a href="#zenfinder">ZenFinder</a>
+                <a href="https://www.zenfinder.ai">ZenFinder</a>
               </li>
               <li>
-                <a href="#zenstrin">Zenstrin</a>
+                <a href="https://www.zenstrin.com">Zenstrin</a>
               </li>
               <li>
                 <a href="/blog">Blog</a>
@@ -1515,7 +1515,7 @@ export default function ZenstrinLandingPage() {
       </header>
 
       <div className={`mobile-menu ${isMenuOpen ? "open" : ""}`}>
-        <a href="#zenstrin" onClick={() => setIsMenuOpen(false)}>
+        <a href="https://www.zenstrin.com" onClick={() => setIsMenuOpen(false)}>
           Zenstrin
         </a>
         <a href="https://www.zenfinder.ai" onClick={() => setIsMenuOpen(false)}>
