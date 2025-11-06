@@ -17,7 +17,6 @@ function BlogPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle hash routing when component mounts
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -25,20 +24,17 @@ function BlogPage() {
         const postId = hash.replace('#', '');
         setHighlightedPostId(postId);
         
-        // Scroll to the post after a short delay to ensure DOM is ready
         setTimeout(() => {
           const element = document.getElementById(`post-${postId}`);
           if (element) {
-            const yOffset = -100; // Adjust for fixed header
+            const yOffset = -100;
             const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
             
-            // Add highlight effect
             element.style.transition = 'all 0.5s ease';
             element.style.boxShadow = '0 0 0 3px rgba(247, 150, 28, 0.3)';
             element.style.backgroundColor = 'rgba(247, 150, 28, 0.05)';
             
-            // Remove highlight after 3 seconds
             setTimeout(() => {
               element.style.boxShadow = '';
               element.style.backgroundColor = '';
@@ -49,10 +45,8 @@ function BlogPage() {
       }
     };
 
-    // Check for hash on initial load
     handleHashChange();
 
-    // Listen for hash changes
     window.addEventListener('hashchange', handleHashChange);
     
     return () => {
@@ -254,8 +248,8 @@ function BlogPage() {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
+                <li><a href="https://www.zenfinder.ai" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
               </ul>
             </div>
             <div>
@@ -521,8 +515,8 @@ function ArticleDetail({ post, onBack }: { post: any, onBack: () => void }) {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
+                <li><a href="https://www.zenfinder.ai" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
               </ul>
             </div>
             <div>

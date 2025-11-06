@@ -426,18 +426,13 @@ function PrivacyPage() {
                 <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
                 <ul className="space-y-2 text-gray-600 text-sm">
                   <li>
-                    <a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">
+                    <a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">
                       Zenstrin
                     </a>
                   </li>
                   <li>
-                    <a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">
+                    <a href="https://www.zenfinder.ai" className="hover:text-[#f7961c] transition-colors">
                       ZenFinder
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#f7961c] transition-colors">
-                      Pricing
                     </a>
                   </li>
                 </ul>
@@ -447,18 +442,13 @@ function PrivacyPage() {
                 <h3 className="font-semibold mb-4 text-gray-900">Company</h3>
                 <ul className="space-y-2 text-gray-600 text-sm">
                   <li>
-                    <a href="#" className="hover:text-[#f7961c] transition-colors">
+                    <a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">
                       About
                     </a>
                   </li>
                   <li>
                     <a href="/blog" className="hover:text-[#f7961c] transition-colors">
                       Blog
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#f7961c] transition-colors">
-                      Careers
                     </a>
                   </li>
                 </ul>
@@ -470,16 +460,6 @@ function PrivacyPage() {
                   <li>
                     <a href="/privacy-policy" className="hover:text-[#f7961c] transition-colors">
                       Privacy
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#f7961c] transition-colors">
-                      Terms
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-[#f7961c] transition-colors">
-                      Security
                     </a>
                   </li>
                 </ul>

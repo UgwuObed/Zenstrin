@@ -328,8 +328,8 @@ function ContactPage() {
             <div>
               <h3 className="font-semibold mb-4 text-gray-900">Products</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
-                <li><a href="/#zenstrin-features" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
-                <li><a href="/#zenfinder-features" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
+                <li><a href="https://www.zenstrin.com" className="hover:text-[#f7961c] transition-colors">Property Management Software</a></li>
+                <li><a href="https://www.zenfinder.ai" className="hover:text-[#f7961c] transition-colors">ZenFinder</a></li>
               </ul>
             </div>
             <div>
